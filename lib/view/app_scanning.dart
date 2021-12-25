@@ -43,7 +43,7 @@ class _TabScanningState extends State<TabScanning> {
       return;
     }
     final regions = <Region>[
-      Region( ///Mint
+     /* Region( ///Mint
         identifier: 'b4aa8223b45d32ad90204da9b2adef1d',
         proximityUUID: 'b9407f30-f5f8-466e-aff9-25556b57fe7d',
         major: 44515,
@@ -54,7 +54,7 @@ class _TabScanningState extends State<TabScanning> {
         proximityUUID: 'b9407f30-f5f8-466e-aff9-25556b57fe7d',
         major: 8925,
         minor: 10345,
-      ),
+      ), */
       Region( ///Blueberry
         identifier: '1599f9a4e04485eae967c17c6b940510',
         proximityUUID: 'b9407f30-f5f8-466e-aff9-25556b57fe7d',
@@ -93,6 +93,7 @@ class _TabScanningState extends State<TabScanning> {
       });
     }
   }
+
   int _compareParameters(Beacon a, Beacon b) {
     int compare = a.proximityUUID.compareTo(b.proximityUUID);
 

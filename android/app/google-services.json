@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "261215420286",
+    "project_id": "unimy-engineering-lab",
+    "storage_bucket": "unimy-engineering-lab.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261215420286:android:eb029bb449eabc75b37d2f",
+        "android_client_info": {
+          "package_name": "com.example.smart_engineering_lab"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "261215420286-qltg073k8cdpdq689ff28oc07ig2s251.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDc7M_AAlrbU__zuexceyuzbT4NMURRuHs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "261215420286-qltg073k8cdpdq689ff28oc07ig2s251.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

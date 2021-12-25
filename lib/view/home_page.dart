@@ -95,8 +95,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flutter Beacon'),
-        centerTitle: false,
+        title: const Text('UNIMY ENGINEERING LAB'),
+        centerTitle: true,
         actions: <Widget>[
           Obx(() {
             if (!controller.locationServiceEnabled)
@@ -137,7 +137,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     : Icons.location_off,
               ),
               color:
-              controller.locationServiceEnabled ? Colors.blue : Colors.red,
+              controller.locationServiceEnabled ? Colors.redAccent : Colors.red,
               onPressed: controller.locationServiceEnabled
                   ? () {}
                   : handleOpenLocationSettings,
@@ -150,7 +150,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               return IconButton(
                 tooltip: 'Bluetooth ON',
                 icon: Icon(Icons.bluetooth_connected),
-                onPressed: () {},
+                onPressed: (
+
+                    ) {},
                 color: Colors.lightBlueAccent,
               );
             }
