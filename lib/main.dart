@@ -1,40 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:smart_engineering_lab/LoginScreen.dart';
-import 'package:flutter_beacon/flutter_beacon.dart';
+import 'package:smart_engineering_lab/requirement_state_controller.dart';
+import 'package:smart_engineering_lab/view/home_page.dart';
+
 
 Future<void> main() async {
   runApp(const MyApp());
-  var _streamRanging;
-  var _streamMonitoring;
-
-  try{
-    await flutterBeacon.initializeAndCheckScanning;
-  } on PlatformException catch(e){
-      print("iBeacon library failed to initialize, check your code again");
-  }
-  final regions = <Region>[];
-  regions.add(Region(
-    identifier: 'b4aa8223b45d32ad90204da9b2adef1d',
-    proximityUUID: 'b9407f30-f5f8-466e-aff9-25556b57fe7d'
-  ));
-  // to start ranging beacons
-  _streamRanging = flutterBeacon.ranging(regions).listen((RangingResult result) {
-    // result contains a region and list of beacons found
-    // list can be empty if no matching beacons were found in range
-  });
-
-// to stop ranging beacons
-  _streamRanging.cancel();
-
-  // to start monitoring beacons
-  _streamMonitoring = flutterBeacon.monitoring(regions).listen((MonitoringResult result) {
-    // result contains a region, event type and event state
-  });
-
-// to stop monitoring beacons
-  _streamMonitoring.cancel();
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -43,17 +18,35 @@ class MyApp extends StatelessWidget {
   @override
 
   Widget build(BuildContext context) {
+    Get.put(RequirementStateController());
+
+    final themeData = Theme.of(context);
+    final primary = Colors.red;
     return MaterialApp(
       title: 'UNIMY ENGINEERING LAB',
       theme: ThemeData(
-        // This is the theme of your application.
-        primarySwatch: Colors.red,
+        brightness: Brightness.light,
+        primarySwatch: primary,
+        appBarTheme: themeData.appBarTheme.copyWith(
+          brightness: Brightness.light,
+          elevation: 0.5,
+          color: Colors.white,
+          actionsIconTheme: themeData.primaryIconTheme.copyWith(
+            color: primary,
+          ),
+          iconTheme: themeData.primaryIconTheme.copyWith(
+            color: primary,
+          ),
+          textTheme: themeData.primaryTextTheme.copyWith(
+            headline6: themeData.textTheme.headline6?.copyWith(
+              color: primary,
+            ),
+          ),
+        ),
       ),
-     home: const MyHomePage(title: 'UNIMY ENGINEERING LAB'),
-
-      //home: LoginScreen(),
-      debugShowCheckedModeBanner: false,
-
+     //home: const MyHomePage(title: 'UNIMY ENGINEERING LAB'),
+      home: HomePage(),
+     debugShowCheckedModeBanner: false,
     );
   }
 }
