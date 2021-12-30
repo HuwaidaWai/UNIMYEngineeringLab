@@ -31,6 +31,7 @@ class _TabScanningState extends State<TabScanning> {
       }
     });
   }
+
   initScanBeacon() async {
     await flutterBeacon.initializeScanning;
     if (!controller.authorizationStatusOk ||
@@ -38,29 +39,30 @@ class _TabScanningState extends State<TabScanning> {
         !controller.bluetoothEnabled) {
       print(
           'RETURNED, authorizationStatusOk=${controller.authorizationStatusOk}, '
-              'locationServiceEnabled=${controller.locationServiceEnabled}, '
-              'bluetoothEnabled=${controller.bluetoothEnabled}');
+          'locationServiceEnabled=${controller.locationServiceEnabled}, '
+          'bluetoothEnabled=${controller.bluetoothEnabled}');
       return;
     }
     final regions = <Region>[
-     /* Region( ///Mint
-        identifier: 'b4aa8223b45d32ad90204da9b2adef1d',
-        proximityUUID: 'b9407f30-f5f8-466e-aff9-25556b57fe7d',
-        major: 44515,
-        minor: 60728,
-      ),
-      Region( ///Sky
+      //  Region( ///Mint
+      //     identifier: 'b4aa8223b45d32ad90204da9b2adef1d',
+      //     proximityUUID: 'b9407f30-f5f8-466e-aff9-25556b57fe7d',
+      //     major: 44515,
+      //     minor: 60728,
+      //   ),
+      Region(
+        ///Sky123
         identifier: '90531162000f5deb643c5a7de2539b02',
-        proximityUUID: 'b9407f30-f5f8-466e-aff9-25556b57fe7d',
+        proximityUUID: 'b9407f30-f5f8-466e-aff9-25556b57fe6d',
         major: 8925,
         minor: 10345,
-      ), */
-      Region( ///Blueberry
-        identifier: '1599f9a4e04485eae967c17c6b940510',
-        proximityUUID: 'b9407f30-f5f8-466e-aff9-25556b57fe7d',
-        major: 27698,
-        minor: 53676,
       ),
+      // Region( ///Blueberry
+      //   identifier: '1599f9a4e04485eae967c17c6b940510',
+      //   proximityUUID: 'b9407f30-f5f8-466e-aff9-25556b57fe7d',
+      //   major: 27698,
+      //   minor: 53676,
+      // ),
     ];
 
     if (_streamRanging != null) {
@@ -72,19 +74,20 @@ class _TabScanningState extends State<TabScanning> {
 
     _streamRanging =
         flutterBeacon.ranging(regions).listen((RangingResult result) {
-          print(result);
-          if (mounted) {
-            setState(() {
-              _regionBeacons[result.region] = result.beacons;
-              _beacons.clear();
-              _regionBeacons.values.forEach((list) {
-                _beacons.addAll(list);
-              });
-              _beacons.sort(_compareParameters);
-            });
-          }
+      print(result);
+      if (mounted) {
+        setState(() {
+          _regionBeacons[result.region] = result.beacons;
+          _beacons.clear();
+          _regionBeacons.values.forEach((list) {
+            _beacons.addAll(list);
+          });
+          _beacons.sort(_compareParameters);
         });
+      }
+    });
   }
+
   pauseScanBeacon() async {
     _streamRanging?.pause();
     if (_beacons.isNotEmpty) {
@@ -107,52 +110,54 @@ class _TabScanningState extends State<TabScanning> {
 
     return compare;
   }
+
   @override
   void dispose() {
     _streamRanging?.cancel();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _beacons.isEmpty
           ? Center(child: CircularProgressIndicator())
           : ListView(
-        children: ListTile.divideTiles(
-          context: context,
-          tiles: _beacons.map(
-                (beacon) {
-              return ListTile(
-                title: Text(
-                  beacon.proximityUUID,
-                  style: TextStyle(fontSize: 15.0),
-                ),
-                subtitle: new Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    Flexible(
-                      child: Text(
-                        'Major: ${beacon.major}\nMinor: ${beacon.minor}',
-                        style: TextStyle(fontSize: 13.0),
+              children: ListTile.divideTiles(
+                context: context,
+                tiles: _beacons.map(
+                  (beacon) {
+                    return ListTile(
+                      title: Text(
+                        beacon.proximityUUID,
+                        style: TextStyle(fontSize: 15.0),
                       ),
-                      flex: 1,
-                      fit: FlexFit.tight,
-                    ),
-                    Flexible(
-                      child: Text(
-                        'Accuracy: ${beacon.accuracy}m\nRSSI: ${beacon.rssi}',
-                        style: TextStyle(fontSize: 13.0),
+                      subtitle: new Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          Flexible(
+                            child: Text(
+                              'Major: ${beacon.major}\nMinor: ${beacon.minor}',
+                              style: TextStyle(fontSize: 13.0),
+                            ),
+                            flex: 1,
+                            fit: FlexFit.tight,
+                          ),
+                          Flexible(
+                            child: Text(
+                              'Accuracy: ${beacon.accuracy}m\nRSSI: ${beacon.rssi}',
+                              style: TextStyle(fontSize: 13.0),
+                            ),
+                            flex: 2,
+                            fit: FlexFit.tight,
+                          )
+                        ],
                       ),
-                      flex: 2,
-                      fit: FlexFit.tight,
-                    )
-                  ],
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-        ).toList(),
-      ),
+              ).toList(),
+            ),
     );
   }
 }

@@ -10,6 +10,8 @@ import 'package:smart_engineering_lab/view/app_scanning.dart';
 import 'package:get/get.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -48,7 +50,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     print('AUTHORIZATION $authorizationStatus');
 
     final locationServiceEnabled =
-    await flutterBeacon.checkLocationServicesIfEnabled;
+        await flutterBeacon.checkLocationServicesIfEnabled;
     controller.updateLocationService(locationServiceEnabled);
     print('LOCATION SERVICE $locationServiceEnabled');
 
@@ -136,8 +138,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     ? Icons.location_on
                     : Icons.location_off,
               ),
-              color:
-              controller.locationServiceEnabled ? Colors.redAccent : Colors.red,
+              color: controller.locationServiceEnabled
+                  ? Colors.redAccent
+                  : Colors.red,
               onPressed: controller.locationServiceEnabled
                   ? () {}
                   : handleOpenLocationSettings,
@@ -150,9 +153,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               return IconButton(
                 tooltip: 'Bluetooth ON',
                 icon: Icon(Icons.bluetooth_connected),
-                onPressed: (
-
-                    ) {},
+                onPressed: () {},
                 color: Colors.lightBlueAccent,
               );
             }

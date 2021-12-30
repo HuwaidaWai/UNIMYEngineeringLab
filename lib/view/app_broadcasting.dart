@@ -8,6 +8,7 @@ class TabBroadcasting extends StatefulWidget {
   @override
   _TabBroadcastingState createState() => _TabBroadcastingState();
 }
+
 class _TabBroadcastingState extends State<TabBroadcasting> {
   final controller = Get.find<RequirementStateController>();
   final clearFocus = FocusNode();
@@ -16,14 +17,14 @@ class _TabBroadcastingState extends State<TabBroadcasting> {
   final regexUUID = RegExp(
       r'[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}');
   final uuidController =
-  TextEditingController(text: 'CB10023F-A318-3394-4199-A8730C7C1AEC');
+      TextEditingController(text: 'CB10023F-A318-3394-4199-A8730C7C1AEC');
   final majorController = TextEditingController(text: '0');
   final minorController = TextEditingController(text: '0');
 
   bool get broadcastReady =>
       controller.authorizationStatusOk == true &&
-          controller.locationServiceEnabled == true &&
-          controller.bluetoothEnabled == true;
+      controller.locationServiceEnabled == true &&
+      controller.bluetoothEnabled == true;
 
   @override
   void initState() {
@@ -52,28 +53,27 @@ class _TabBroadcastingState extends State<TabBroadcasting> {
       body: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(clearFocus),
         child: Obx(
-              () =>
-          broadcastReady != true
-              ? Center(child: Text('Please wait...'))
+          () => broadcastReady != true
+              ? const Center(child: Text('Please wait...'))
               : Form(
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  uuidField,
-                  majorField,
-                  minorField,
-                  SizedBox(height: 16),
-                  buttonBroadcast,
-                ],
-              ),
-            ),
-          ),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        uuidField,
+                        majorField,
+                        minorField,
+                        const SizedBox(height: 16),
+                        buttonBroadcast,
+                      ],
+                    ),
+                  ),
+                ),
         ),
       ),
     );
@@ -83,7 +83,7 @@ class _TabBroadcastingState extends State<TabBroadcasting> {
     return TextFormField(
       readOnly: broadcasting,
       controller: uuidController,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         labelText: 'Proximity UUID',
       ),
       validator: (val) {
@@ -99,11 +99,12 @@ class _TabBroadcastingState extends State<TabBroadcasting> {
       },
     );
   }
+
   Widget get majorField {
     return TextFormField(
       readOnly: broadcasting,
       controller: majorController,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         labelText: 'Major',
       ),
       keyboardType: TextInputType.number,
@@ -126,11 +127,12 @@ class _TabBroadcastingState extends State<TabBroadcasting> {
       },
     );
   }
+
   Widget get minorField {
     return TextFormField(
       readOnly: broadcasting,
       controller: minorController,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         labelText: 'Minor',
       ),
       keyboardType: TextInputType.number,
@@ -158,8 +160,8 @@ class _TabBroadcastingState extends State<TabBroadcasting> {
     final ButtonStyle raisedButtonStyle = ElevatedButton.styleFrom(
       onPrimary: Colors.white,
       primary: broadcasting ? Colors.red : Theme.of(context).primaryColor,
-      minimumSize: Size(88, 36),
-      padding: EdgeInsets.symmetric(horizontal: 16),
+      minimumSize: const Size(88, 36),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(2)),
       ),
