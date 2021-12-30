@@ -7,8 +7,7 @@ import 'package:smart_engineering_lab/view/collapsing_navigation_drawer.dart';
 import 'package:smart_engineering_lab/view/home_page.dart';
 import 'package:smart_engineering_lab/custom_navigation_drawer.dart';
 
-
-Future<void> main() async {
+void main() async {
   runApp(const MyApp());
 }
 
@@ -17,21 +16,19 @@ class MyApp extends StatelessWidget {
 
   // This widget is the root of your application.
   @override
-
   Widget build(BuildContext context) {
     Get.put(RequirementStateController());
-    Map<int, Color> color =
-    {
-      50:Color.fromRGBO(136,14,79, .1),
-      100:Color.fromRGBO(136,14,79, .2),
-      200:Color.fromRGBO(136,14,79, .3),
-      300:Color.fromRGBO(136,14,79, .4),
-      400:Color.fromRGBO(136,14,79, .5),
-      500:Color.fromRGBO(136,14,79, .6),
-      600:Color.fromRGBO(136,14,79, .7),
-      700:Color.fromRGBO(136,14,79, .8),
-      800:Color.fromRGBO(136,14,79, .9),
-      900:Color.fromRGBO(136,14,79, 1),
+    Map<int, Color> color = {
+      50: Color.fromRGBO(136, 14, 79, .1),
+      100: Color.fromRGBO(136, 14, 79, .2),
+      200: Color.fromRGBO(136, 14, 79, .3),
+      300: Color.fromRGBO(136, 14, 79, .4),
+      400: Color.fromRGBO(136, 14, 79, .5),
+      500: Color.fromRGBO(136, 14, 79, .6),
+      600: Color.fromRGBO(136, 14, 79, .7),
+      700: Color.fromRGBO(136, 14, 79, .8),
+      800: Color.fromRGBO(136, 14, 79, .9),
+      900: Color.fromRGBO(136, 14, 79, 1),
     };
 
     MaterialColor colorCustom = MaterialColor(0xffd10e48, color);
@@ -59,9 +56,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-     home: const MyHomePage(title: 'UNIMY ENGINEERING LAB'),
-     // home: HomePage(),
-     debugShowCheckedModeBanner: false,
+      home: const MyHomePage(title: 'UNIMY ENGINEERING LAB'),
+      // home: HomePage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -76,10 +73,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -88,8 +83,8 @@ class _MyHomePageState extends State<MyHomePage> {
       //drawer: CollapsingNavigationDrawer(),
       body: Stack(
         children: <Widget>[
-          Container(color:Colors.white),
-          CollapsingNavigationDrawer()
+          Container(color: Colors.white),
+          // CollapsingNavigationDrawer()
         ],
         /*child: RaisedButton(
           child: Text('Login'),
@@ -101,4 +96,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
