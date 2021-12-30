@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:smart_engineering_lab/LoginScreen.dart';
 import 'package:smart_engineering_lab/requirement_state_controller.dart';
+import 'package:smart_engineering_lab/view/admin_page.dart';
 import 'package:smart_engineering_lab/view/app_scanning.dart';
 import 'package:smart_engineering_lab/view/collapsing_navigation_drawer.dart';
 import 'package:smart_engineering_lab/view/home_page.dart';
@@ -85,15 +86,28 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Stack(
         children: <Widget>[
           Container(color: Colors.white),
-          Positioned(
-            child: RaisedButton(
-              child: Text('Login'),
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const HomePage()));
-              },
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  child: const Text('Admin'),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => const Admin()));
+                  },
+                ),
+                ElevatedButton(
+                  child: const Text('Testing'),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomePage()));
+                  },
+                ),
+              ],
             ),
-            bottom: 10,
           )
           // CollapsingNavigationDrawer()
         ],

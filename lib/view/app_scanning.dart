@@ -11,6 +11,7 @@ class TabScanning extends StatefulWidget {
 
 class _TabScanningState extends State<TabScanning> {
   StreamSubscription<RangingResult>? _streamRanging;
+  StreamSubscription<MonitoringResult>? _streamMonitor;
   final _regionBeacons = <Region, List<Beacon>>{};
   final _beacons = <Beacon>[];
   final controller = Get.find<RequirementStateController>();
@@ -74,7 +75,7 @@ class _TabScanningState extends State<TabScanning> {
 
     _streamRanging =
         flutterBeacon.ranging(regions).listen((RangingResult result) {
-      print(result);
+      print('Ranging Result $result');
       if (mounted) {
         setState(() {
           _regionBeacons[result.region] = result.beacons;
@@ -86,6 +87,11 @@ class _TabScanningState extends State<TabScanning> {
         });
       }
     });
+
+    // _streamMonitor =
+    //     flutterBeacon.monitoring(regions).listen((MonitoringResult event) {
+    //   print('Monitoring Result ${event.monitoringState.toString()}');
+    // });
   }
 
   pauseScanBeacon() async {
