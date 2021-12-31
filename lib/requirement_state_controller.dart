@@ -5,7 +5,7 @@ class RequirementStateController extends GetxController {
   var bluetoothState = BluetoothState.stateOff.obs;
   var authorizationStatus = AuthorizationStatus.notDetermined.obs;
   var locationService = false.obs;
-
+  var _regionsList = <Region>[].obs;
   var _startBroadcasting = false.obs;
   var _startScanning = false.obs;
   var _pauseScanning = false.obs;
@@ -13,8 +13,12 @@ class RequirementStateController extends GetxController {
   bool get bluetoothEnabled => bluetoothState.value == BluetoothState.stateOn;
   bool get authorizationStatusOk =>
       authorizationStatus.value == AuthorizationStatus.allowed ||
-          authorizationStatus.value == AuthorizationStatus.always;
+      authorizationStatus.value == AuthorizationStatus.always;
   bool get locationServiceEnabled => locationService.value;
+  Stream<List<Region>> get regionList => _regionsList.stream;
+  updateRegionsList(List<Region> regions) {
+    _regionsList.value = regions;
+  }
 
   updateBluetoothState(BluetoothState state) {
     bluetoothState.value = state;

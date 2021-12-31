@@ -1,13 +1,21 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:smart_engineering_lab/LoginScreen.dart';
+import 'package:smart_engineering_lab/model/beacons_mode.dart';
+import 'package:smart_engineering_lab/model/beacons_view_model.dart';
 import 'package:smart_engineering_lab/requirement_state_controller.dart';
 import 'package:smart_engineering_lab/view/admin_page.dart';
 import 'package:smart_engineering_lab/view/app_scanning.dart';
 import 'package:smart_engineering_lab/view/collapsing_navigation_drawer.dart';
 import 'package:smart_engineering_lab/view/home_page.dart';
 import 'package:smart_engineering_lab/custom_navigation_drawer.dart';
+import 'package:smart_engineering_lab/view/lab_module_views.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -21,21 +29,21 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.put(RequirementStateController());
     Map<int, Color> color = {
-      50: Color.fromRGBO(136, 14, 79, .1),
-      100: Color.fromRGBO(136, 14, 79, .2),
-      200: Color.fromRGBO(136, 14, 79, .3),
-      300: Color.fromRGBO(136, 14, 79, .4),
-      400: Color.fromRGBO(136, 14, 79, .5),
-      500: Color.fromRGBO(136, 14, 79, .6),
-      600: Color.fromRGBO(136, 14, 79, .7),
-      700: Color.fromRGBO(136, 14, 79, .8),
-      800: Color.fromRGBO(136, 14, 79, .9),
-      900: Color.fromRGBO(136, 14, 79, 1),
+      50: const Color.fromRGBO(136, 14, 79, .1),
+      100: const Color.fromRGBO(136, 14, 79, .2),
+      200: const Color.fromRGBO(136, 14, 79, .3),
+      300: const Color.fromRGBO(136, 14, 79, .4),
+      400: const Color.fromRGBO(136, 14, 79, .5),
+      500: const Color.fromRGBO(136, 14, 79, .6),
+      600: const Color.fromRGBO(136, 14, 79, .7),
+      700: const Color.fromRGBO(136, 14, 79, .8),
+      800: const Color.fromRGBO(136, 14, 79, .9),
+      900: const Color.fromRGBO(136, 14, 79, 1),
     };
 
     MaterialColor colorCustom = MaterialColor(0xffd10e48, color);
     final themeData = Theme.of(context);
-    final primary = Color(0xffd10e48);
+    final primary = const Color(0xffd10e48);
     return MaterialApp(
       title: 'UNIMY ENGINEERING LAB',
       theme: ThemeData(
@@ -44,7 +52,7 @@ class MyApp extends StatelessWidget {
         appBarTheme: themeData.appBarTheme.copyWith(
           brightness: Brightness.light,
           elevation: 0.5,
-          color: Color(0xffd10e48),
+          color: const Color(0xffd10e48),
           actionsIconTheme: themeData.primaryIconTheme.copyWith(
             color: primary,
           ),
@@ -74,49 +82,416 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+  final storage = GetStorage('iBeacons');
+  var listBeacons = <BeaconEstimote>[];
+  final controller = Get.find<RequirementStateController>();
+  StreamSubscription<BluetoothState>? _streamBluetooth;
+
+  StreamSubscription<RangingResult>? _streamRanging;
+  final _regionBeacons = <Region, List<Beacon>>{};
+  final _beacons = <BeaconViewModel>[];
+  var regions = <Region>[];
+  @override
+  void initState() {
+    WidgetsBinding.instance?.addObserver(this);
+
+    listeningState();
+    super.initState();
+    initStorage();
+    controller.startStream.listen((flag) {
+      if (flag == true) {
+        initScanBeacon();
+      }
+    });
+
+    controller.pauseStream.listen((flag) {
+      if (flag == true) {
+        pauseScanBeacon();
+      }
+    });
+  }
+
+  initStorage() async {
+    await GetStorage.init('iBeacons');
+    var beacons = storage.read('beacons') as List;
+    print('List Beacons $beacons');
+    if (beacons != null) {
+      for (var element in beacons) {
+        listBeacons.add(BeaconEstimote.fromJson(element));
+      }
+      // listBeacons = beacons.map((e) => BeaconEstimote.fromJson(e)).toList();
+      for (var e in listBeacons) {
+        regions.add(Region(
+            identifier: e.identifier!,
+            proximityUUID: e.uuid,
+            major: e.major,
+            minor: e.minor));
+      }
+      controller.updateRegionsList(regions);
+    }
+
+    // <Region>[
+    //   //  Region( ///Mint
+    //   //     identifier: 'b4aa8223b45d32ad90204da9b2adef1d',
+    //   //     proximityUUID: 'b9407f30-f5f8-466e-aff9-25556b57fe7d',
+    //   //     major: 44515,
+    //   //     minor: 60728,
+    //   //   ),
+    //   Region(
+    //     ///Sky123
+    //     identifier: '90531162000f5deb643c5a7de2539b02',
+    //     proximityUUID: 'b9407f30-f5f8-466e-aff9-25556b57fe6d',
+    //     major: 8925,
+    //     minor: 10345,
+    //   ),
+    //   // Region( ///Blueberry
+    //   //   identifier: '1599f9a4e04485eae967c17c6b940510',
+    //   //   proximityUUID: 'b9407f30-f5f8-466e-aff9-25556b57fe7d',
+    //   //   major: 27698,
+    //   //   minor: 53676,
+    //   // ),
+    // ];
+
+    storage.listen(() {
+      var list = storage.read('beacons') as List;
+      listBeacons = list.map((e) => BeaconEstimote.fromJson(e)).toList();
+      print('listBeacons listen $listBeacons');
+    });
+  }
+
+  initScanBeacon() async {
+    await flutterBeacon.initializeScanning;
+    if (!controller.authorizationStatusOk ||
+        !controller.locationServiceEnabled ||
+        !controller.bluetoothEnabled) {
+      print(
+          'RETURNED, authorizationStatusOk=${controller.authorizationStatusOk}, '
+          'locationServiceEnabled=${controller.locationServiceEnabled}, '
+          'bluetoothEnabled=${controller.bluetoothEnabled}');
+      return;
+    }
+
+    if (_streamRanging != null) {
+      if (_streamRanging!.isPaused) {
+        _streamRanging?.resume();
+        return;
+      }
+    }
+    controller.regionList.listen((event) {
+      if (event.isNotEmpty) {
+        _streamRanging =
+            flutterBeacon.ranging(event).listen((RangingResult result) {
+          print('Ranging Result $result');
+          if (mounted) {
+            setState(() {
+              _regionBeacons[result.region] = result.beacons;
+              _beacons.clear();
+              _regionBeacons.values.forEach((list) {
+                list.forEach((element) {
+                  var beaconEstimate = listBeacons.firstWhere(
+                    (beacon) => beacon.identifier == result.region.identifier,
+                  );
+
+                  _beacons.add(BeaconViewModel(
+                      beacon: element, name: beaconEstimate.name));
+                });
+                // _beacons.addAll(list);
+              });
+              _beacons.sort(_compareParameters);
+            });
+          }
+        });
+      }
+    });
+
+    // _streamMonitor =
+    //     flutterBeacon.monitoring(regions).listen((MonitoringResult event) {
+    //   print('Monitoring Result ${event.monitoringState.toString()}');
+    // });
+  }
+
+  pauseScanBeacon() async {
+    _streamRanging?.pause();
+    if (_beacons.isNotEmpty) {
+      setState(() {
+        _beacons.clear();
+      });
+    }
+  }
+
+  int _compareParameters(BeaconViewModel a, BeaconViewModel b) {
+    int compare = a.beacon!.proximityUUID.compareTo(b.beacon!.proximityUUID);
+
+    if (compare == 0) {
+      compare = a.beacon!.major.compareTo(b.beacon!.major);
+    }
+
+    if (compare == 0) {
+      compare = a.beacon!.minor.compareTo(b.beacon!.minor);
+    }
+
+    return compare;
+  }
+
+  @override
+  void dispose() {
+    _streamBluetooth?.cancel();
+    _streamRanging?.cancel();
+    super.dispose();
+  }
+
+  listeningState() async {
+    print('Listening to bluetooth state');
+    _streamBluetooth = flutterBeacon
+        .bluetoothStateChanged()
+        .listen((BluetoothState state) async {
+      controller.updateBluetoothState(state);
+      await checkAllRequirements();
+    });
+  }
+
+  checkAllRequirements() async {
+    final bluetoothState = await flutterBeacon.bluetoothState;
+    controller.updateBluetoothState(bluetoothState);
+    print('BLUETOOTH $bluetoothState');
+    if (bluetoothState == BluetoothState.stateOff) {
+      handleOpenBluetooth();
+    }
+
+    final authorizationStatus = await flutterBeacon.authorizationStatus;
+    controller.updateAuthorizationStatus(authorizationStatus);
+    print('AUTHORIZATION $authorizationStatus');
+    if (authorizationStatus == AuthorizationStatus.notDetermined) {
+      await flutterBeacon.requestAuthorization;
+    }
+
+    final locationServiceEnabled =
+        await flutterBeacon.checkLocationServicesIfEnabled;
+    controller.updateLocationService(locationServiceEnabled);
+    print('LOCATION SERVICE $locationServiceEnabled');
+    if (!locationServiceEnabled) {
+      handleOpenLocationSettings();
+    }
+    if (controller.bluetoothEnabled &&
+        controller.authorizationStatusOk &&
+        controller.locationServiceEnabled) {
+      print('STATE READY');
+
+      print('SCANNING');
+      controller.startScanning();
+    } else {
+      print('STATE NOT READY');
+      controller.pauseScanning();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    print('AppLifecycleState = $state');
+    if (state == AppLifecycleState.resumed) {
+      if (_streamBluetooth != null) {
+        if (_streamBluetooth!.isPaused) {
+          _streamBluetooth?.resume();
+        }
+      }
+      await checkAllRequirements();
+    } else if (state == AppLifecycleState.paused) {
+      _streamBluetooth?.pause();
+    }
+  }
+
+  handleOpenBluetooth() async {
+    if (Platform.isAndroid) {
+      try {
+        await flutterBeacon.openBluetoothSettings;
+      } on PlatformException catch (e) {
+        print(e);
+      }
+    } else if (Platform.isIOS) {
+      await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Bluetooth is Off'),
+            content:
+                const Text('Please enable Bluetooth on Settings > Bluetooth.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  handleOpenLocationSettings() async {
+    if (Platform.isAndroid) {
+      await flutterBeacon.openLocationSettings;
+    } else if (Platform.isIOS) {
+      await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Location Services Off'),
+            content: const Text(
+              'Please enable Location Services on Settings > Privacy > Location Services.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         centerTitle: true,
       ),
-      //drawer: CollapsingNavigationDrawer(),
-      body: Stack(
-        children: <Widget>[
-          Container(color: Colors.white),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  child: const Text('Admin'),
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => const Admin()));
-                  },
-                ),
-                ElevatedButton(
-                  child: const Text('Testing'),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomePage()));
-                  },
-                ),
-              ],
+      bottomSheet: Container(
+        decoration: BoxDecoration(
+            color: Colors.grey[200],
+            // boxShadow: [],
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(16.0))),
+        height: height * 0.2,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              child: const Text('Admin'),
+              onPressed: () async {
+                var isChange = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Admin(
+                              storage: storage,
+                            )));
+              },
             ),
-          )
-          // CollapsingNavigationDrawer()
-        ],
-        /*child: RaisedButton(
-          child: Text('Login'),
-          onPressed: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
-          },
-        ),*/
+            ElevatedButton(
+              child: const Text('Testing'),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const HomePage()));
+              },
+            ),
+          ],
+        ),
+      ),
+      //drawer: CollapsingNavigationDrawer(),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+          child: _beacons.isEmpty
+              ? const Center(child: CircularProgressIndicator())
+              : ListView(
+                  shrinkWrap: true,
+                  children: ListTile.divideTiles(
+                    context: context,
+                    tiles: _beacons.map(
+                      (beacon) {
+                        return ListTile(
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (conttext) {
+                              return const LabModuleViews();
+                            }));
+                          },
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 30),
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(16))),
+                          tileColor: Colors.redAccent,
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${beacon.name}',
+                                style: const TextStyle(
+                                    fontSize: 18.0, color: Colors.white),
+                              ),
+                              Text(
+                                '(${beacon.beacon!.proximityUUID})',
+                                style: const TextStyle(
+                                    fontSize: 12.0, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          subtitle: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: <Widget>[
+                              // Flexible(
+                              //   child: Text(
+                              //     'Name: ${beacon.name}',
+                              //     style: const TextStyle(
+                              //         fontSize: 13.0, color: Colors.white),
+                              //   ),
+                              //   flex: 1,
+                              //   fit: FlexFit.tight,
+                              // ),
+                              Flexible(
+                                child: Text(
+                                  'Major: ${beacon.beacon!.major}\nMinor: ${beacon.beacon!.minor}',
+                                  style: const TextStyle(
+                                      fontSize: 13.0, color: Colors.white),
+                                ),
+                                flex: 1,
+                                fit: FlexFit.tight,
+                              ),
+                              Flexible(
+                                child: Text(
+                                  'Accuracy: ${beacon.beacon!.accuracy}m\nRSSI: ${beacon.beacon!.rssi}',
+                                  style: const TextStyle(
+                                      fontSize: 13.0, color: Colors.white),
+                                ),
+                                flex: 2,
+                                fit: FlexFit.tight,
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ).toList(),
+                ),
+          // StreamBuilder<List<Region>>(
+          //     stream: controller.regionList,
+          //     builder: (context, snapshot) {
+          //       if (snapshot.hasData) {
+          //         return ListView.builder(
+          //             shrinkWrap: true,
+          //             itemCount: snapshot.data!.length,
+          //             itemBuilder: (context, index) {
+          //               return Card(
+          //                 child: Column(
+          //                   children: [
+          //                     Text(snapshot.data![index].identifier),
+          //                     Text(snapshot.data![index].proximityUUID!),
+          //                     Text(snapshot.data![index].major.toString()),
+          //                     Text(snapshot.data![index].minor.toString()),
+          //                   ],
+          //                 ),
+          //               );
+          //             });
+          //       } else {
+          //         return const CircularProgressIndicator();
+          //       }
+          //     }),
+        ),
       ),
     );
   }
