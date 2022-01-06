@@ -98,8 +98,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
     listeningState();
     super.initState();
-    initStorage();
+
     controller.startStream.listen((flag) {
+      printInfo(info: 'startstream $flag');
       if (flag == true) {
         initScanBeacon();
       }
@@ -162,6 +163,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   initScanBeacon() async {
     await flutterBeacon.initializeScanning;
+    print('Test: '
+        'RETURNED, authorizationStatusOk=${controller.authorizationStatusOk}, '
+        'locationServiceEnabled=${controller.locationServiceEnabled}, '
+        'bluetoothEnabled=${controller.bluetoothEnabled}');
     if (!controller.authorizationStatusOk ||
         !controller.locationServiceEnabled ||
         !controller.bluetoothEnabled) {
@@ -178,7 +183,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         return;
       }
     }
+
     controller.regionList.listen((event) {
+      printInfo(info: '$event');
       if (event.isNotEmpty) {
         _streamRanging =
             flutterBeacon.ranging(event).listen((RangingResult result) {
@@ -204,6 +211,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         });
       }
     });
+
+    await initStorage();
 
     // _streamMonitor =
     //     flutterBeacon.monitoring(regions).listen((MonitoringResult event) {
