@@ -32,56 +32,63 @@ class _AdminState extends State<Admin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextFormField(
-              controller: nameTextController,
-              decoration: const InputDecoration(hintText: 'Name'),
-            ),
-            TextFormField(
-              controller: idTextController,
-              decoration: const InputDecoration(hintText: 'Identifier'),
-            ),
-            TextFormField(
-              controller: uuidTextController,
-              decoration: const InputDecoration(hintText: 'ProximityUUID'),
-            ),
-            TextFormField(
-              keyboardType: TextInputType.number,
-              controller: majorTextController,
-              decoration: const InputDecoration(hintText: 'Major'),
-            ),
-            TextFormField(
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(hintText: 'Minor'),
-              controller: minorTextController,
-            ),
-            Container(
-                margin: const EdgeInsets.only(top: 20),
-                padding: const EdgeInsets.symmetric(vertical: 40),
-                width: double.infinity,
-                child: ElevatedButton(
-                    // style: ElevatedButton.styleFrom(),
-                    onPressed: _onSubmit,
-                    child: const Text('Submit'))),
-            ElevatedButton(
-                // style: ElevatedButton.styleFrom(),
-                onPressed: _onDelete,
-                child: const Text('Delete'))
-          ],
+      body: SingleChildScrollView(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextFormField(
+                controller: nameTextController,
+                decoration: const InputDecoration(hintText: 'Name'),
+              ),
+              TextFormField(
+                controller: idTextController,
+                decoration: const InputDecoration(hintText: 'Identifier'),
+              ),
+              TextFormField(
+                controller: uuidTextController,
+                decoration: const InputDecoration(hintText: 'ProximityUUID'),
+              ),
+              TextFormField(
+                keyboardType: TextInputType.number,
+                controller: majorTextController,
+                decoration: const InputDecoration(hintText: 'Major'),
+              ),
+              TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(hintText: 'Minor'),
+                controller: minorTextController,
+              ),
+              Container(
+                  margin: const EdgeInsets.only(top: 20),
+                  padding: const EdgeInsets.symmetric(vertical: 40),
+                  width: double.infinity,
+                  child: ElevatedButton(
+                      // style: ElevatedButton.styleFrom(),
+                      onPressed: _onSubmit,
+                      child: const Text('Submit'))),
+              ElevatedButton(
+                  // style: ElevatedButton.styleFrom(),
+                  onPressed: _onDelete,
+                  child: const Text('Delete'))
+            ],
+          ),
         ),
       ),
     );
   }
 
   _onDelete() async {
-    await widget.storage.remove('beacons');
+    try {
+      await widget.storage.remove('beacons');
+    } catch (e) {
+      print('OnDelete $e');
+    }
   }
 
-  _onSubmit() {
+  _onSubmit() async {
     var beacons = widget.storage.read('beacons');
     var listBeacons = [];
     print('Read from storage : $beacons');
@@ -105,6 +112,7 @@ class _AdminState extends State<Admin> {
     // Map dataToStorage = {'data': listBeacons};
     // var encoded = jsonEncode(dataToStorage);
     print(listBeacons);
-    widget.storage.write('beacons', listBeacons);
+    await widget.storage.write('beacons', listBeacons);
+    Navigator.pop(context);
   }
 }

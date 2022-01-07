@@ -1,15 +1,21 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:provider/provider.dart';
 import 'package:smart_engineering_lab/LoginScreen.dart';
+import 'package:smart_engineering_lab/helper/rssi_signal_helper.dart';
 import 'package:smart_engineering_lab/model/beacons_mode.dart';
 import 'package:smart_engineering_lab/model/beacons_view_model.dart';
+import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
 import 'package:smart_engineering_lab/requirement_state_controller.dart';
+import 'package:smart_engineering_lab/services/auth_service.dart';
 import 'package:smart_engineering_lab/view/admin_page.dart';
 import 'package:smart_engineering_lab/view/app_scanning.dart';
 import 'package:smart_engineering_lab/view/collapsing_navigation_drawer.dart';
@@ -43,33 +49,59 @@ class MyApp extends StatelessWidget {
 
     MaterialColor colorCustom = MaterialColor(0xffd10e48, color);
     final themeData = Theme.of(context);
-    final primary = const Color(0xffd10e48);
-    return MaterialApp(
-      title: 'UNIMY ENGINEERING LAB',
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primarySwatch: colorCustom,
-        appBarTheme: themeData.appBarTheme.copyWith(
+    const primary = Color(0xffd10e48);
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => RootChangeNotifier()),
+        Provider(
+          create: (_) => AuthService(FirebaseAuth.instance),
+        ),
+        StreamProvider(
+            create: (context) => context.read<AuthService>().authStateChanges,
+            initialData: null)
+      ],
+      child: MaterialApp(
+        title: 'UNIMY ENGINEERING LAB',
+        theme: ThemeData(
           brightness: Brightness.light,
-          elevation: 0.5,
-          color: const Color(0xffd10e48),
-          actionsIconTheme: themeData.primaryIconTheme.copyWith(
-            color: primary,
-          ),
-          iconTheme: themeData.primaryIconTheme.copyWith(
-            color: primary,
-          ),
-          textTheme: themeData.primaryTextTheme.copyWith(
-            headline6: themeData.textTheme.headline6?.copyWith(
+          primarySwatch: colorCustom,
+          appBarTheme: themeData.appBarTheme.copyWith(
+            elevation: 0.5,
+            color: const Color(0xffd10e48),
+            actionsIconTheme: themeData.primaryIconTheme.copyWith(
               color: primary,
             ),
+            iconTheme: themeData.primaryIconTheme.copyWith(
+              color: primary,
+            ),
+            textTheme: themeData.primaryTextTheme.copyWith(
+              headline6: themeData.textTheme.headline6?.copyWith(
+                color: primary,
+              ),
+            ),
+            systemOverlayStyle: SystemUiOverlayStyle.dark,
           ),
         ),
+        home: const MyHomePage(title: 'UNIMY ENGINEERING LAB'),
+        // home: HomePage(),
+        debugShowCheckedModeBanner: false,
       ),
-      home: const MyHomePage(title: 'UNIMY ENGINEERING LAB'),
-      // home: HomePage(),
-      debugShowCheckedModeBanner: false,
     );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final firebaseUser = context.watch<User>();
+
+    print('This is firebase user : $firebaseUser');
+    if (firebaseUser != null) {
+      return const MyHomePage(title: 'UNIMY ENGINEERING LAB');
+    }
+    return const LoginScreen();
   }
 }
 
@@ -89,9 +121,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   StreamSubscription<BluetoothState>? _streamBluetooth;
 
   StreamSubscription<RangingResult>? _streamRanging;
-  final _regionBeacons = <Region, List<Beacon>>{};
-  final _beacons = <BeaconViewModel>[];
+  final _regionBeacons = <Region, List<BeaconViewModel>>{};
+  var _beacons = <BeaconViewModel>[];
   var regions = <Region>[];
+
+  bool _isLoading = true;
   @override
   void initState() {
     WidgetsBinding.instance?.addObserver(this);
@@ -115,7 +149,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   initStorage() async {
     await GetStorage.init('iBeacons');
-    var beacons = storage.read('beacons') as List;
+
+    var beacons = storage.read('beacons');
     print('List Beacons $beacons');
     if (beacons != null) {
       for (var element in beacons) {
@@ -130,6 +165,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             minor: e.minor));
       }
       controller.updateRegionsList(regions);
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
     }
 
     // <Region>[
@@ -156,8 +195,18 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
     storage.listen(() {
       var list = storage.read('beacons') as List;
-      listBeacons = list.map((e) => BeaconEstimote.fromJson(e)).toList();
-      print('listBeacons listen $listBeacons');
+      if (list != null) {
+        for (var e in listBeacons) {
+          regions.add(Region(
+              identifier: e.identifier!,
+              proximityUUID: e.uuid,
+              major: e.major,
+              minor: e.minor));
+        }
+        print('In listen callback $list');
+        listBeacons = list.map((e) => BeaconEstimote.fromJson(e)).toList();
+        print('listBeacons listen $listBeacons');
+      }
     });
   }
 
@@ -192,20 +241,32 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           print('Ranging Result $result');
           if (mounted) {
             setState(() {
-              _regionBeacons[result.region] = result.beacons;
-              _beacons.clear();
-              _regionBeacons.values.forEach((list) {
-                list.forEach((element) {
-                  var beaconEstimate = listBeacons.firstWhere(
-                    (beacon) => beacon.identifier == result.region.identifier,
-                  );
+              var _name = listBeacons
+                  .firstWhere(
+                      (element) =>
+                          element.identifier == result.region.identifier,
+                      orElse: () => BeaconEstimote(name: null))
+                  .name;
+              if (_name != null) {
+                _beacons = result.beacons
+                    .map((e) => BeaconViewModel(beacon: e, name: _name))
+                    .toList();
+                _regionBeacons[result.region] = _beacons;
+                print('Map Region beacons $_regionBeacons');
+              }
 
-                  _beacons.add(BeaconViewModel(
-                      beacon: element, name: beaconEstimate.name));
-                });
-                // _beacons.addAll(list);
-              });
-              _beacons.sort(_compareParameters);
+              // _regionBeacons.values.forEach((list) {
+              //   list.forEach((element) {
+              //     var beaconEstimate = listBeacons.firstWhere(
+              //       (beacon) => beacon.identifier == result.region.identifier,
+              //     );
+              //     log('FOR BEACON ${beaconEstimate.identifier}, NAME: ${beaconEstimate.name}');
+              //     _beacons.add(BeaconViewModel(
+              //         beacon: element, name: beaconEstimate.name));
+              //   });
+              //   // _beacons.addAll(list);
+              // });
+              // _beacons.sort(_compareParameters);
             });
           }
         });
@@ -229,19 +290,19 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
   }
 
-  int _compareParameters(BeaconViewModel a, BeaconViewModel b) {
-    int compare = a.beacon!.proximityUUID.compareTo(b.beacon!.proximityUUID);
+  // int _compareParameters(BeaconViewModel a, BeaconViewModel b) {
+  //   int compare = a.beacon!.proximityUUID.compareTo(b.beacon!.proximityUUID);
 
-    if (compare == 0) {
-      compare = a.beacon!.major.compareTo(b.beacon!.major);
-    }
+  //   if (compare == 0) {
+  //     compare = a.beacon!.major.compareTo(b.beacon!.major);
+  //   }
 
-    if (compare == 0) {
-      compare = a.beacon!.minor.compareTo(b.beacon!.minor);
-    }
+  //   if (compare == 0) {
+  //     compare = a.beacon!.minor.compareTo(b.beacon!.minor);
+  //   }
 
-    return compare;
-  }
+  //   return compare;
+  // }
 
   @override
   void dispose() {
@@ -404,79 +465,101 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-          child: _beacons.isEmpty
+          child: _regionBeacons.isEmpty && _isLoading
               ? const Center(child: CircularProgressIndicator())
-              : ListView(
-                  shrinkWrap: true,
-                  children: ListTile.divideTiles(
-                    context: context,
-                    tiles: _beacons.map(
-                      (beacon) {
-                        return ListTile(
-                          onTap: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (conttext) {
-                              return const LabModuleViews();
-                            }));
+              : _regionBeacons.isEmpty && !_isLoading
+                  ? const Center(child: Text('No Beacons'))
+                  : ListView(
+                      shrinkWrap: true,
+                      children: ListTile.divideTiles(
+                        context: context,
+                        tiles: _regionBeacons.values.map(
+                          (beacon) {
+                            if (beacon.isNotEmpty) {
+                              return ListTile(
+                                onTap: () {
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (conttext) {
+                                    return const LabModuleViews();
+                                  }));
+                                },
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 30),
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(16))),
+                                tileColor: Colors.redAccent,
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${beacon.first.name}',
+                                      style: const TextStyle(
+                                          fontSize: 18.0, color: Colors.white),
+                                    ),
+                                    Text(
+                                      '(${beacon.first.beacon!.proximityUUID})',
+                                      style: const TextStyle(
+                                          fontSize: 12.0, color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: <Widget>[
+                                        // Flexible(
+                                        //   child: Text(
+                                        //     'Name: ${beacon.name}',
+                                        //     style: const TextStyle(
+                                        //         fontSize: 13.0, color: Colors.white),
+                                        //   ),
+                                        //   flex: 1,
+                                        //   fit: FlexFit.tight,
+                                        // ),
+                                        Flexible(
+                                          child: Text(
+                                            'Major: ${beacon.first.beacon!.major}\nMinor: ${beacon.first.beacon!.minor}',
+                                            style: const TextStyle(
+                                                fontSize: 13.0,
+                                                color: Colors.white),
+                                          ),
+                                          flex: 1,
+                                          fit: FlexFit.tight,
+                                        ),
+                                        Flexible(
+                                          child: Text(
+                                            'Accuracy: ${beacon.first.beacon!.accuracy}m\nRSSI: ${beacon.first.beacon!.rssi}',
+                                            style: const TextStyle(
+                                                fontSize: 13.0,
+                                                color: Colors.white),
+                                          ),
+                                          flex: 2,
+                                          fit: FlexFit.tight,
+                                        ),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        'Signal : ${RssiSignal.rssiTranslator(beacon.first.beacon!.rssi)}',
+                                        style: const TextStyle(
+                                            fontSize: 13.0,
+                                            color: Colors.white),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            } else {
+                              return const Text('Getting Beacons data .. ');
+                            }
                           },
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 30),
-                          shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(16))),
-                          tileColor: Colors.redAccent,
-                          title: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${beacon.name}',
-                                style: const TextStyle(
-                                    fontSize: 18.0, color: Colors.white),
-                              ),
-                              Text(
-                                '(${beacon.beacon!.proximityUUID})',
-                                style: const TextStyle(
-                                    fontSize: 12.0, color: Colors.white),
-                              ),
-                            ],
-                          ),
-                          subtitle: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              // Flexible(
-                              //   child: Text(
-                              //     'Name: ${beacon.name}',
-                              //     style: const TextStyle(
-                              //         fontSize: 13.0, color: Colors.white),
-                              //   ),
-                              //   flex: 1,
-                              //   fit: FlexFit.tight,
-                              // ),
-                              Flexible(
-                                child: Text(
-                                  'Major: ${beacon.beacon!.major}\nMinor: ${beacon.beacon!.minor}',
-                                  style: const TextStyle(
-                                      fontSize: 13.0, color: Colors.white),
-                                ),
-                                flex: 1,
-                                fit: FlexFit.tight,
-                              ),
-                              Flexible(
-                                child: Text(
-                                  'Accuracy: ${beacon.beacon!.accuracy}m\nRSSI: ${beacon.beacon!.rssi}',
-                                  style: const TextStyle(
-                                      fontSize: 13.0, color: Colors.white),
-                                ),
-                                flex: 2,
-                                fit: FlexFit.tight,
-                              )
-                            ],
-                          ),
-                        );
-                      },
+                        ),
+                      ).toList(),
                     ),
-                  ).toList(),
-                ),
           // StreamBuilder<List<Region>>(
           //     stream: controller.regionList,
           //     builder: (context, snapshot) {
