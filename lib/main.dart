@@ -3,13 +3,15 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_engineering_lab/LoginScreen.dart';
+import 'package:smart_engineering_lab/constant/color_constant.dart';
+import 'package:smart_engineering_lab/login_screens.dart';
 import 'package:smart_engineering_lab/helper/rssi_signal_helper.dart';
 import 'package:smart_engineering_lab/model/beacons_mode.dart';
 import 'package:smart_engineering_lab/model/beacons_view_model.dart';
@@ -24,6 +26,8 @@ import 'package:smart_engineering_lab/custom_navigation_drawer.dart';
 import 'package:smart_engineering_lab/view/lab_module_views.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -34,20 +38,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(RequirementStateController());
-    Map<int, Color> color = {
-      50: const Color.fromRGBO(136, 14, 79, .1),
-      100: const Color.fromRGBO(136, 14, 79, .2),
-      200: const Color.fromRGBO(136, 14, 79, .3),
-      300: const Color.fromRGBO(136, 14, 79, .4),
-      400: const Color.fromRGBO(136, 14, 79, .5),
-      500: const Color.fromRGBO(136, 14, 79, .6),
-      600: const Color.fromRGBO(136, 14, 79, .7),
-      700: const Color.fromRGBO(136, 14, 79, .8),
-      800: const Color.fromRGBO(136, 14, 79, .9),
-      900: const Color.fromRGBO(136, 14, 79, 1),
-    };
 
-    MaterialColor colorCustom = MaterialColor(0xffd10e48, color);
     final themeData = Theme.of(context);
     const primary = Color(0xffd10e48);
     return MultiProvider(
@@ -82,7 +73,7 @@ class MyApp extends StatelessWidget {
             systemOverlayStyle: SystemUiOverlayStyle.dark,
           ),
         ),
-        home: const MyHomePage(title: 'UNIMY ENGINEERING LAB'),
+        home: const AuthWrapper(),
         // home: HomePage(),
         debugShowCheckedModeBanner: false,
       ),
@@ -95,7 +86,7 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final firebaseUser = context.watch<User>();
+    final firebaseUser = context.watch<User?>();
 
     print('This is firebase user : $firebaseUser');
     if (firebaseUser != null) {

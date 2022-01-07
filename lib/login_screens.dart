@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 
+import 'package:smart_engineering_lab/sign_up_screen.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -28,8 +30,8 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                const BoxShadow(
+              boxShadow: const [
+                BoxShadow(
                     color: Colors.black26, blurRadius: 6, offset: Offset(0, 2))
               ]),
           height: 60,
@@ -168,7 +170,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget buildSignUpBtn() {
     return GestureDetector(
-        onTap: () => print("Sign Up Pressed"),
+        onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const SignUpScreen())),
         child: RichText(
           text: const TextSpan(children: [
             TextSpan(
