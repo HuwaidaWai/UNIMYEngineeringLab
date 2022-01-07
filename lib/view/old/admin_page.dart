@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:smart_engineering_lab/model/beacons_mode.dart';
+import 'package:smart_engineering_lab/model/beacons_model.dart';
 
 class Admin extends StatefulWidget {
   final GetStorage storage;

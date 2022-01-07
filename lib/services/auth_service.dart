@@ -25,7 +25,7 @@ class AuthService {
     }
   }
 
-  Future signUp({
+  Future<String> signUp({
     required String email,
     required String password,
     required String displayName,
@@ -41,11 +41,28 @@ class AuthService {
       //     .whenComplete(() {});
       // profilePicUrl = await task.ref.getDownloadURL();
 
-      await DatabaseService(userCredential.user!.uid)
+      await DatabaseService(uid: userCredential.user!.uid)
           .createUserData(email: email, name: displayName, role: role);
 
       changeNotifier.setState(ViewState.IDLE);
       return "Signed Up";
+    } on FirebaseAuthException catch (e) {
+      changeNotifier.setState(ViewState.IDLE);
+      throw e.message!;
+    } catch (e) {
+      changeNotifier.setState(ViewState.IDLE);
+      throw e.toString();
+    }
+  }
+
+  Future signOut(
+    RootChangeNotifier changeNotifier,
+  ) async {
+    try {
+      changeNotifier.setState(ViewState.BUSY);
+      await _firebaseAuth.signOut();
+      changeNotifier.setState(ViewState.IDLE);
+      return "signout";
     } on FirebaseAuthException catch (e) {
       changeNotifier.setState(ViewState.IDLE);
       throw e.message!;

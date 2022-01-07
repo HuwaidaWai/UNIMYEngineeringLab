@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
-import 'package:smart_engineering_lab/requirement_state_controller.dart';
-import 'package:smart_engineering_lab/view/app_broadcasting.dart';
-import 'package:smart_engineering_lab/view/app_scanning.dart';
+import 'package:smart_engineering_lab/view/old/requirement_state_controller.dart';
+import 'package:smart_engineering_lab/view/old/app_broadcasting.dart';
+import 'package:smart_engineering_lab/view/old/app_scanning.dart';
 import 'package:get/get.dart';
 
 class HomePage extends StatefulWidget {

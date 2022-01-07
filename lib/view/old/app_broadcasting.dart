@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
-import 'package:smart_engineering_lab/requirement_state_controller.dart';
+import 'package:smart_engineering_lab/view/old/requirement_state_controller.dart';
 import 'package:get/get.dart';
 
 class TabBroadcasting extends StatefulWidget {

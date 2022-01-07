@@ -1,4 +1,4 @@
-import '../custom_navigation_drawer.dart';
+import 'custom_navigation_drawer.dart';
 import 'package:flutter/material.dart';
 
 class CollapsingListTile extends StatefulWidget {
@@ -10,10 +10,10 @@ class CollapsingListTile extends StatefulWidget {
 
   CollapsingListTile(
       {required this.title,
-        required this.icon,
-        required this.animationController,
-        this.isSelected = false,
-        required this.onTap});
+      required this.icon,
+      required this.animationController,
+      this.isSelected = false,
+      required this.onTap});
 
   @override
   _CollapsingListTileState createState() => _CollapsingListTileState();
@@ -55,9 +55,9 @@ class _CollapsingListTileState extends State<CollapsingListTile> {
             SizedBox(width: sizedBoxAnimation.value),
             (widthAnimation.value >= 190)
                 ? Text(widget.title,
-                style: widget.isSelected
-                    ? listTitleSelectedTextStyle
-                    : listTitleDefaultTextStyle)
+                    style: widget.isSelected
+                        ? listTitleSelectedTextStyle
+                        : listTitleDefaultTextStyle)
                 : Container()
           ],
         ),

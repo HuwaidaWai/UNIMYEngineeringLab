@@ -1,4 +1,4 @@
-import '../custom_navigation_drawer.dart';
+import 'custom_navigation_drawer.dart';
 import 'package:flutter/material.dart';
 
 class CollapsingNavigationDrawer extends StatefulWidget {
@@ -20,8 +20,8 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-        vsync: this, duration: Duration(milliseconds: 300));
+    _animationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
     widthAnimation = Tween<double>(begin: maxWidth, end: minWidth)
         .animate(_animationController);
   }
@@ -42,8 +42,16 @@ class CollapsingNavigationDrawerState extends State<CollapsingNavigationDrawer>
         color: Colors.white,
         child: Column(
           children: <Widget>[
-            CollapsingListTile(title: 'Huwaida', icon: Icons.person, animationController: _animationController, onTap: () {  },),
-            Divider(color: Colors.grey, height: 40.0,),
+            CollapsingListTile(
+              title: 'Huwaida',
+              icon: Icons.person,
+              animationController: _animationController,
+              onTap: () {},
+            ),
+            Divider(
+              color: Colors.grey,
+              height: 40.0,
+            ),
             Expanded(
               child: ListView.separated(
                 separatorBuilder: (context, counter) {

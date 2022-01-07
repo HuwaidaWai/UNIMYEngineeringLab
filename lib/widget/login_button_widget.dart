@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 class LoginButtonWidget extends StatefulWidget {
   final Function() onPressed;
-  const LoginButtonWidget({Key? key, required this.onPressed})
+  final Widget child;
+  const LoginButtonWidget(
+      {Key? key, required this.onPressed, required this.child})
       : super(key: key);
 
   @override
@@ -15,7 +17,7 @@ class _LoginButtonWidgetState extends State<LoginButtonWidget> {
     final size = MediaQuery.of(context).size;
     return Container(
       constraints:
-          BoxConstraints(minWidth: size.width, maxWidth: 500, minHeight: 60),
+          BoxConstraints(minWidth: size.width, maxWidth: 500, minHeight: 50),
       child: ElevatedButton(
           style: ElevatedButton.styleFrom(
               elevation: 2,
@@ -23,7 +25,7 @@ class _LoginButtonWidgetState extends State<LoginButtonWidget> {
               shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(20)))),
           onPressed: widget.onPressed,
-          child: const Text('Login')),
+          child: widget.child),
     );
   }
 }

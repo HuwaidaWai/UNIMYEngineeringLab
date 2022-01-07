@@ -11,19 +11,20 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_engineering_lab/constant/color_constant.dart';
+import 'package:smart_engineering_lab/view/home/home_page_index.dart';
 import 'package:smart_engineering_lab/login_screens.dart';
 import 'package:smart_engineering_lab/helper/rssi_signal_helper.dart';
-import 'package:smart_engineering_lab/model/beacons_mode.dart';
+import 'package:smart_engineering_lab/model/beacons_model.dart';
 import 'package:smart_engineering_lab/model/beacons_view_model.dart';
 import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
-import 'package:smart_engineering_lab/requirement_state_controller.dart';
+import 'package:smart_engineering_lab/view/old/requirement_state_controller.dart';
 import 'package:smart_engineering_lab/services/auth_service.dart';
-import 'package:smart_engineering_lab/view/admin_page.dart';
-import 'package:smart_engineering_lab/view/app_scanning.dart';
-import 'package:smart_engineering_lab/view/collapsing_navigation_drawer.dart';
-import 'package:smart_engineering_lab/view/home_page.dart';
-import 'package:smart_engineering_lab/custom_navigation_drawer.dart';
-import 'package:smart_engineering_lab/view/lab_module_views.dart';
+import 'package:smart_engineering_lab/view/old/admin_page.dart';
+import 'package:smart_engineering_lab/view/old/app_scanning.dart';
+import 'package:smart_engineering_lab/view/old/collapsing_navigation_drawer.dart';
+import 'package:smart_engineering_lab/view/old/home_page.dart';
+import 'package:smart_engineering_lab/view/old/custom_navigation_drawer.dart';
+import 'package:smart_engineering_lab/view/old/lab_module_views.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,7 +39,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(RequirementStateController());
-
     final themeData = Theme.of(context);
     const primary = Color(0xffd10e48);
     return MultiProvider(
@@ -90,7 +90,7 @@ class AuthWrapper extends StatelessWidget {
 
     print('This is firebase user : $firebaseUser');
     if (firebaseUser != null) {
-      return const MyHomePage(title: 'UNIMY ENGINEERING LAB');
+      return const HomePageIndex();
     }
     return const LoginScreen();
   }
@@ -280,20 +280,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       });
     }
   }
-
-  // int _compareParameters(BeaconViewModel a, BeaconViewModel b) {
-  //   int compare = a.beacon!.proximityUUID.compareTo(b.beacon!.proximityUUID);
-
-  //   if (compare == 0) {
-  //     compare = a.beacon!.major.compareTo(b.beacon!.major);
-  //   }
-
-  //   if (compare == 0) {
-  //     compare = a.beacon!.minor.compareTo(b.beacon!.minor);
-  //   }
-
-  //   return compare;
-  // }
 
   @override
   void dispose() {

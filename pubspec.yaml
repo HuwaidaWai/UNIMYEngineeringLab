@@ -34,6 +34,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_beacon: ^0.5.1
+  floating_bottom_navigation_bar: ^1.5.2
   font_awesome_flutter: ^9.2.0
   get: ^4.6.1
   get_storage: ^2.0.3

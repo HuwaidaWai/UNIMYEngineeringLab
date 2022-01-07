@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_engineering_lab/constant/color_constant.dart';
+import 'package:smart_engineering_lab/enum/view_state_enum.dart';
+import 'package:smart_engineering_lab/main.dart';
 import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
 import 'package:smart_engineering_lab/services/auth_service.dart';
 import 'package:smart_engineering_lab/widget/login_button_widget.dart';
@@ -49,6 +51,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 24.0),
                 child: LoginButtonWidget(
+                  child: changeNotifier.getViewState == ViewState.BUSY
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : const Text('Login'),
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       if (pwController.text != repwController.text) {
@@ -73,12 +80,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         print(nameController.text);
                         print(repwController.text);
                         print(studentSelected ? 'STUDENT' : 'LECTURER');
-                        context.read<AuthService>().signUp(
-                            email: emailController.text,
-                            password: pwController.text,
-                            displayName: nameController.text,
-                            role: studentSelected ? 'STUDENT' : 'LECTURER',
-                            changeNotifier: changeNotifier);
+                        context
+                            .read<AuthService>()
+                            .signUp(
+                                email: emailController.text,
+                                password: pwController.text,
+                                displayName: nameController.text,
+                                role: studentSelected ? 'STUDENT' : 'LECTURER',
+                                changeNotifier: changeNotifier)
+                            .catchError((e) {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text('ERROR'),
+                                  content: Text(e.toString()),
+                                  actions: [
+                                    ElevatedButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                        child: const Text('Okay'))
+                                  ],
+                                );
+                              });
+                        }).whenComplete(() => Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) {
+                                  return const AuthWrapper();
+                                })));
                       }
                     }
                   },

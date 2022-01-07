@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:get/get.dart';
-import 'package:smart_engineering_lab/requirement_state_controller.dart';
+import 'package:smart_engineering_lab/view/old/requirement_state_controller.dart';
 
 class TabScanning extends StatefulWidget {
   @override
