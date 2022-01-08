@@ -55,3 +55,6 @@ flutter_icons:
   image_path: "assets/unimy.png"
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/
