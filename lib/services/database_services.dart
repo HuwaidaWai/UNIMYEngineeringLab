@@ -1,8 +1,10 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:smart_engineering_lab/enum/view_state_enum.dart';
 import 'package:smart_engineering_lab/model/beacons_model.dart';
 import 'package:smart_engineering_lab/model/user_model.dart';
+import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
 
 class DatabaseService {
   final String? uid;
@@ -52,7 +54,9 @@ class DatabaseService {
         );
   }
 
-  Future createBeacon(BeaconEstimote beaconEstimote) async {
+  Future createBeacon(
+      BeaconEstimote beaconEstimote, RootChangeNotifier changeNotifier) async {
+    changeNotifier.setState(ViewState.BUSY);
     await beaconsDataCollection.doc(beaconEstimote.identifier).set({
       'name': beaconEstimote.name,
       'identifier': beaconEstimote.identifier,
@@ -60,6 +64,7 @@ class DatabaseService {
       'minor': beaconEstimote.minor,
       'uuid': beaconEstimote.uuid
     });
+    changeNotifier.setState(ViewState.IDLE);
   }
 
   Stream<List<BeaconEstimote>> get listOfBeacons {

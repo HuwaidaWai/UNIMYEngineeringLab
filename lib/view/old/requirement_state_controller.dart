@@ -9,7 +9,7 @@ class RequirementStateController extends GetxController {
   var _startBroadcasting = false.obs;
   var _startScanning = false.obs;
   var _pauseScanning = false.obs;
-
+  bool get getStartScanning => _startScanning.value;
   bool get bluetoothEnabled => bluetoothState.value == BluetoothState.stateOn;
   bool get authorizationStatusOk =>
       authorizationStatus.value == AuthorizationStatus.allowed ||

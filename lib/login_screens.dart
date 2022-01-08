@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:smart_engineering_lab/enum/view_state_enum.dart';
+import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
+import 'package:smart_engineering_lab/services/auth_service.dart';
 import 'dart:async';
 
 import 'package:smart_engineering_lab/sign_up_screen.dart';
@@ -12,6 +16,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final emailController = TextEditingController();
+  final pwController = TextEditingController();
   Widget buildEmail() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,10 +42,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Colors.black26, blurRadius: 6, offset: Offset(0, 2))
               ]),
           height: 60,
-          child: const TextField(
+          child: TextFormField(
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return '*This field is required';
+              }
+              return null;
+            },
+            controller: emailController,
             keyboardType: TextInputType.emailAddress,
-            style: TextStyle(color: Colors.black87),
-            decoration: InputDecoration(
+            style: const TextStyle(color: Colors.black87),
+            decoration: const InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 14),
               prefixIcon: Icon(
@@ -74,15 +88,22 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                const BoxShadow(
+              boxShadow: const [
+                BoxShadow(
                     color: Colors.black26, blurRadius: 6, offset: Offset(0, 2))
               ]),
           height: 60,
-          child: const TextField(
+          child: TextFormField(
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return '*This field is required';
+              }
+              return null;
+            },
+            controller: pwController,
             obscureText: true,
-            style: TextStyle(color: Colors.black87),
-            decoration: InputDecoration(
+            style: const TextStyle(color: Colors.black87),
+            decoration: const InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 14),
               prefixIcon: Icon(
@@ -148,22 +169,32 @@ class _LoginScreenState extends State<LoginScreen> {
   } */
 
   Widget buildLoginBtn() {
+    final changeNotifier = context.watch<RootChangeNotifier>();
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 25),
       width: double.infinity,
       child: RaisedButton(
         elevation: 5,
-        onPressed: () => print('Login Pressed'),
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            context.read<AuthService>().signIn(
+                email: emailController.text,
+                password: pwController.text,
+                changeNotifier: changeNotifier);
+          }
+        },
         padding: const EdgeInsets.all(15),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         color: Colors.white,
-        child: const Text(
-          'LOGIN',
-          style: TextStyle(
-              color: Color(0xffd10e48),
-              fontSize: 18,
-              fontWeight: FontWeight.bold),
-        ),
+        child: changeNotifier.getViewState == ViewState.BUSY
+            ? const CircularProgressIndicator()
+            : const Text(
+                'LOGIN',
+                style: TextStyle(
+                    color: Color(0xffd10e48),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold),
+              ),
       ),
     );
   }
@@ -215,26 +246,29 @@ class _LoginScreenState extends State<LoginScreen> {
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 25, vertical: 120),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        const Text(
-                          'UNIMY Engineering Lab',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          const Text(
+                            'UNIMY Engineering Lab',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 50),
-                        buildEmail(),
-                        const SizedBox(height: 20),
-                        buildPassword(),
-                        buildForgotPassBtn(),
-                        //buildRememberCb(),
-                        buildLoginBtn(),
-                        buildSignUpBtn(),
-                      ]),
+                          const SizedBox(height: 50),
+                          buildEmail(),
+                          const SizedBox(height: 20),
+                          buildPassword(),
+                          buildForgotPassBtn(),
+                          //buildRememberCb(),
+                          buildLoginBtn(),
+                          buildSignUpBtn(),
+                        ]),
+                  ),
                 ),
               )
             ]))));

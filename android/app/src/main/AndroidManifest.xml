@@ -2,6 +2,7 @@
     package="com.example.smart_engineering_lab">
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    
    <application
         android:label="UNIMY Engineering Lab"
         android:name="${applicationName}"

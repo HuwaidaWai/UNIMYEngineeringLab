@@ -2,11 +2,16 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:provider/provider.dart';
+import 'package:smart_engineering_lab/enum/view_state_enum.dart';
+import 'package:smart_engineering_lab/main.dart';
 import 'package:smart_engineering_lab/model/beacons_model.dart';
+import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
+import 'package:smart_engineering_lab/services/database_services.dart';
+import 'package:smart_engineering_lab/widget/login_button_widget.dart';
 
 class Admin extends StatefulWidget {
-  final GetStorage storage;
-  const Admin({Key? key, required this.storage}) : super(key: key);
+  const Admin({Key? key}) : super(key: key);
 
   @override
   _AdminState createState() => _AdminState();
@@ -24,13 +29,11 @@ class _AdminState extends State<Admin> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    var beacons = widget.storage.read('beacons');
-
-    print('Read from storage : $beacons');
   }
 
   @override
   Widget build(BuildContext context) {
+    final changeNotifier = context.watch<RootChangeNotifier>();
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -65,11 +68,15 @@ class _AdminState extends State<Admin> {
                   margin: const EdgeInsets.only(top: 20),
                   padding: const EdgeInsets.symmetric(vertical: 40),
                   width: double.infinity,
-                  child: ElevatedButton(
+                  child: LoginButtonWidget(
                       // style: ElevatedButton.styleFrom(),
                       onPressed: _onSubmit,
-                      child: const Text('Submit'))),
-              ElevatedButton(
+                      child: changeNotifier.getViewState == ViewState.BUSY
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : const Text('Submit'))),
+              LoginButtonWidget(
                   // style: ElevatedButton.styleFrom(),
                   onPressed: _onDelete,
                   child: const Text('Delete'))
@@ -81,22 +88,13 @@ class _AdminState extends State<Admin> {
   }
 
   _onDelete() async {
-    try {
-      await widget.storage.remove('beacons');
-    } catch (e) {
+    try {} catch (e) {
       print('OnDelete $e');
     }
   }
 
   _onSubmit() async {
-    var beacons = widget.storage.read('beacons');
-    var listBeacons = [];
-    print('Read from storage : $beacons');
-    if (beacons != null) {
-      listBeacons = beacons;
-      // var beaconsDecoded = jsonDecode(beacons) as List;
-      // listBeacons = beaconsDecoded.map((e) => e).toList();
-    }
+    final changeNotifier = context.read<RootChangeNotifier>();
     Map data = {
       'identifier': idTextController.text,
       'name': nameTextController.text,
@@ -104,15 +102,8 @@ class _AdminState extends State<Admin> {
       'major': int.parse(majorTextController.text),
       'minor': int.parse(minorTextController.text)
     };
-
-    listBeacons.add(data);
-
-    // String encoded = json.encode(listBeacons);
-
-    // Map dataToStorage = {'data': listBeacons};
-    // var encoded = jsonEncode(dataToStorage);
-    print(listBeacons);
-    await widget.storage.write('beacons', listBeacons);
-    Navigator.pop(context);
+    var beaconEstimote = BeaconEstimote.fromJson(data);
+    DatabaseService().createBeacon(beaconEstimote, changeNotifier);
+    Navigator.of(context).pop();
   }
 }
