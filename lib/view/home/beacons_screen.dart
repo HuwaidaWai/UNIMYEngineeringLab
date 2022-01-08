@@ -290,25 +290,30 @@ class _BeaconScreenState extends State<BeaconScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  children: const [
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      child: Text(
-                        'Table Beacons',
-                        style: TextStyle(
-                            fontSize: 28, fontWeight: FontWeight.bold),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 8.0),
+                        child: Text(
+                          'Table Beacons',
+                          style: TextStyle(
+                              fontSize: 28, fontWeight: FontWeight.bold),
+                        ),
                       ),
-                    ),
-                    Text(
-                      'Choose your table section',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ],
+                      Text(
+                        'Choose your table section',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: TextButton(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(elevation: 0),
                     onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) => const Admin())),
                     child: Row(
@@ -346,10 +351,12 @@ class _BeaconScreenState extends State<BeaconScreen>
                                     : ListView.builder(
                                         itemCount: beacon.value.length,
                                         itemBuilder: (context, i) {
-                                          return Text(
-                                            beacon.value[i].name!,
-                                            style: const TextStyle(
-                                                backgroundColor: Colors.red),
+                                          return Column(
+                                            children: [
+                                              Text(
+                                                beacon.value[i].name!,
+                                              ),
+                                            ],
                                           );
                                         }),
                               ),

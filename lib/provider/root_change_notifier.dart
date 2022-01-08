@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:smart_engineering_lab/enum/view_state_enum.dart';
 
 class RootChangeNotifier with ChangeNotifier {
   ViewState _viewState = ViewState.IDLE;
   Role? _role;
+  File? _imageFood;
   bool _isPushedNotification = false;
   void setRole(Role role) {
     _role = role;
@@ -20,6 +23,12 @@ class RootChangeNotifier with ChangeNotifier {
     notifyListeners();
   }
 
+  void setBeaconsImage(File user) {
+    _imageFood = user;
+    notifyListeners();
+  }
+
+  File? get getBeacons => _imageFood;
   bool get getPushedNotification => _isPushedNotification;
   Role get getRoleState => _role!;
   ViewState get getViewState => _viewState;

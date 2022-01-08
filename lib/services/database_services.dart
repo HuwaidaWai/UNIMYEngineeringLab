@@ -1,10 +1,13 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:path/path.dart';
 import 'package:smart_engineering_lab/enum/view_state_enum.dart';
 import 'package:smart_engineering_lab/model/beacons_model.dart';
 import 'package:smart_engineering_lab/model/user_model.dart';
 import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
+import 'package:smart_engineering_lab/services/storage_services.dart';
 
 class DatabaseService {
   final String? uid;
@@ -54,15 +57,21 @@ class DatabaseService {
         );
   }
 
-  Future createBeacon(
-      BeaconEstimote beaconEstimote, RootChangeNotifier changeNotifier) async {
+  Future createBeacon(BeaconEstimote beaconEstimote,
+      RootChangeNotifier changeNotifier, File imageFile) async {
     changeNotifier.setState(ViewState.BUSY);
+    final task = await StorageService.uploadFile(
+        destination:
+            'beaconsimage/${beaconEstimote.identifier}/${basename(imageFile.path)}',
+        file: imageFile);
+    beaconEstimote.pictureLink = await task.ref.getDownloadURL();
     await beaconsDataCollection.doc(beaconEstimote.identifier).set({
       'name': beaconEstimote.name,
       'identifier': beaconEstimote.identifier,
       'major': beaconEstimote.major,
       'minor': beaconEstimote.minor,
-      'uuid': beaconEstimote.uuid
+      'uuid': beaconEstimote.uuid,
+      'pictureLink': beaconEstimote.pictureLink
     });
     changeNotifier.setState(ViewState.IDLE);
   }

@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
 import 'package:smart_engineering_lab/enum/view_state_enum.dart';
 import 'package:smart_engineering_lab/main.dart';
@@ -24,11 +27,73 @@ class _AdminState extends State<Admin> {
   final majorTextController = TextEditingController();
   final minorTextController = TextEditingController();
   // final storage = GetStorage('iBeacons');
+  String? path;
+  Map dataToUpload = {'destination': null, 'file': null};
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+  }
+
+  Widget buildImageContainer() {
+    final changeNotifier = context.read<RootChangeNotifier>();
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(width: 1.0, color: Colors.grey),
+          borderRadius: const BorderRadius.all(Radius.circular(8))),
+      height: 200,
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      child: changeNotifier.getBeacons == null
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                OutlinedButton(
+                    onPressed: () async {
+                      FilePickerResult? result =
+                          await FilePicker.platform.pickFiles(
+                        type: FileType.custom,
+                        allowedExtensions: ['jpg', 'png'],
+                      );
+                      if (result != null) {
+                        //File file = File(result.files.single.path);
+                        PlatformFile platformFile = result.files.first;
+                        setState(() {
+                          path = platformFile.path;
+                          dataToUpload['destination'] =
+                              'beaconsName/${p.basename(path!)}';
+                          dataToUpload['file'] = File(path!);
+                        });
+                        print('This is basename :${p.basename(path!)}');
+                        changeNotifier.setBeaconsImage(File(path!));
+                      }
+                    },
+                    child: const Text('Select Picture'))
+              ],
+            )
+          : GestureDetector(
+              child: Image.file(changeNotifier.getBeacons!),
+              onTap: () async {
+                FilePickerResult? result = await FilePicker.platform.pickFiles(
+                  type: FileType.custom,
+                  allowedExtensions: ['jpg', 'png'],
+                );
+                if (result != null) {
+                  //File file = File(result.files.single.path);
+                  PlatformFile platformFile = result.files.first;
+                  setState(() {
+                    path = platformFile.path;
+                    dataToUpload['destination'] =
+                        'beaconsName/${p.basename(path!)}';
+                    dataToUpload['file'] = File(path!);
+                  });
+                  print('This is basename :${p.basename(path!)}');
+                  changeNotifier.setBeaconsImage(File(path!));
+                }
+              },
+            ),
+    );
   }
 
   @override
@@ -42,6 +107,7 @@ class _AdminState extends State<Admin> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              buildImageContainer(),
               TextFormField(
                 controller: nameTextController,
                 decoration: const InputDecoration(hintText: 'Name'),
@@ -76,10 +142,10 @@ class _AdminState extends State<Admin> {
                               color: Colors.white,
                             )
                           : const Text('Submit'))),
-              LoginButtonWidget(
-                  // style: ElevatedButton.styleFrom(),
-                  onPressed: _onDelete,
-                  child: const Text('Delete'))
+              // LoginButtonWidget(
+              //     // style: ElevatedButton.styleFrom(),
+              //     onPressed: _onDelete,
+              //     child: const Text('Delete'))
             ],
           ),
         ),
@@ -103,7 +169,8 @@ class _AdminState extends State<Admin> {
       'minor': int.parse(minorTextController.text)
     };
     var beaconEstimote = BeaconEstimote.fromJson(data);
-    DatabaseService().createBeacon(beaconEstimote, changeNotifier);
+
+    DatabaseService().createBeacon(beaconEstimote, changeNotifier, File(path!));
     Navigator.of(context).pop();
   }
 }

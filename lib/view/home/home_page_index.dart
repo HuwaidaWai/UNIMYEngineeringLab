@@ -338,7 +338,11 @@ class _HomePageIndexState extends State<HomePageIndex>
         onTap: (int val) {
           bottomTapped(val);
         },
+        selectedBackgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         currentIndex: _bottomSelectedIndex,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.black,
         items: [
           FloatingNavbarItem(icon: Icons.home),
           FloatingNavbarItem(icon: Icons.list),

@@ -4,9 +4,15 @@ class BeaconEstimote {
   String? name;
   int? major;
   int? minor;
+  String? pictureLink;
 
   BeaconEstimote(
-      {this.uuid, this.major, this.minor, this.name, this.identifier});
+      {this.uuid,
+      this.major,
+      this.minor,
+      this.name,
+      this.identifier,
+      this.pictureLink});
 
   factory BeaconEstimote.fromJson(Map json) {
     return BeaconEstimote(
@@ -14,7 +20,8 @@ class BeaconEstimote {
         uuid: json['uuid'],
         name: json['name'],
         major: json['major'],
-        minor: json['minor']);
+        minor: json['minor'],
+        pictureLink: json['pictureLink']);
   }
 
   Map toJson() {
@@ -23,7 +30,8 @@ class BeaconEstimote {
       'uuid': uuid,
       'major': major,
       'minor': minor,
-      'identifier': identifier
+      'identifier': identifier,
+      'pictureLink': pictureLink
     };
   }
 }
