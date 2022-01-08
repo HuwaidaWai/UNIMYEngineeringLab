@@ -183,12 +183,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 email: emailController.text,
                 password: pwController.text,
                 changeNotifier: changeNotifier);
-            var remoteNotificationLaporJumlah = const RemoteNotification(
-                title: 'Lapor Jumlah ',
-                body: 'Sila laporkan jumlah kehadiran pengundi sehingga jam  ');
-            NotificationService().showNotification(
-              remoteNotificationLaporJumlah,
-            );
           }
         },
         padding: const EdgeInsets.all(15),

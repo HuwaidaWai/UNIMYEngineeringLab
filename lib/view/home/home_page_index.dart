@@ -1,14 +1,19 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_messaging/firebase_messaging.dart'
+    as firebaseMessaging;
 import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:smart_engineering_lab/model/beacons_model.dart';
 import 'package:smart_engineering_lab/model/beacons_view_model.dart';
+import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
 import 'package:smart_engineering_lab/services/database_services.dart';
+import 'package:smart_engineering_lab/services/local_notification_services.dart';
 import 'package:smart_engineering_lab/view/home/beacons_screen.dart';
 import 'package:smart_engineering_lab/view/home/home_screen.dart';
 import 'package:smart_engineering_lab/view/home/lab_booking_screen.dart';
@@ -58,12 +63,25 @@ class _HomePageIndexState extends State<HomePageIndex>
   }
 
   getFromDatabase() {
+    final changeNotifier = context.read<RootChangeNotifier>();
     DatabaseService().listOfBeacons.listen((listBeacons) {
       print('listBeacons $listBeacons');
       if (listBeacons.isNotEmpty) {
+        if (changeNotifier.getPushedNotification == false) {
+          var remoteNotificationLaporJumlah =
+              firebaseMessaging.RemoteNotification(
+                  title: 'New beacons detected!',
+                  body: 'There are ${listBeacons.length} nearest');
+          NotificationService().showNotification(
+            remoteNotificationLaporJumlah,
+          );
+          changeNotifier.setPushedNotification(true);
+        }
+
         setState(() {
           listBeaconsGlobal = listBeacons;
         });
+
         for (var e in listBeacons) {
           regions.add(Region(
               identifier: e.identifier!,
