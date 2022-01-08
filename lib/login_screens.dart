@@ -1,9 +1,11 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_engineering_lab/enum/view_state_enum.dart';
 import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
 import 'package:smart_engineering_lab/services/auth_service.dart';
+import 'package:smart_engineering_lab/services/local_notification_services.dart';
 import 'dart:async';
 
 import 'package:smart_engineering_lab/sign_up_screen.dart';
@@ -181,6 +183,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 email: emailController.text,
                 password: pwController.text,
                 changeNotifier: changeNotifier);
+            var remoteNotificationLaporJumlah = const RemoteNotification(
+                title: 'Lapor Jumlah ',
+                body: 'Sila laporkan jumlah kehadiran pengundi sehingga jam  ');
+            NotificationService().showNotification(
+              remoteNotificationLaporJumlah,
+            );
           }
         },
         padding: const EdgeInsets.all(15),

@@ -1,7 +1,8 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
-  AndroidNotificationChannel channel = AndroidNotificationChannel(
+  AndroidNotificationChannel channel = const AndroidNotificationChannel(
       'high_importance_channel', "High Importance Notifcations",
       // "This channel is used important notification",
       groupId: "Notification_group");
@@ -59,8 +60,7 @@ class NotificationService {
   }
 
   Future showNotification(
-    notification,
-    bool isLaporJumlahNotification,
+    RemoteNotification notification,
   ) async {
     AndroidNotificationDetails androidPlatformChannelSpecifics =
         const AndroidNotificationDetails(
