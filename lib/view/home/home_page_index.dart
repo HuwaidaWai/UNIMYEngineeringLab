@@ -322,6 +322,7 @@ class _HomePageIndexState extends State<HomePageIndex>
   int currentIndex = 0;
   @override
   Widget build(BuildContext context) {
+    final changeNotifier = context.read<RootChangeNotifier>();
     return Scaffold(
       body: PageView(
         onPageChanged: (index) {
