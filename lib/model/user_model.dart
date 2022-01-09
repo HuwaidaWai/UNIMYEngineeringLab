@@ -1,8 +1,12 @@
 class UserModel {
-  String? userId;
+  String? uid;
   String? name;
   String? email;
-  String? descrption;
+  String? role;
 
-  UserModel({this.userId, this.name, this.email, this.descrption});
+  UserModel({this.uid, this.name, this.email, this.role});
+
+  Map<String, dynamic> toJson() {
+    return {'uid': uid, 'name': name, 'email': email, 'role': role};
+  }
 }

@@ -46,15 +46,15 @@ class DatabaseService {
 
 //MAPPING TO USER MODEL
   UserModel _userName(DocumentSnapshot snapshot) {
-    final data = snapshot.data();
+    // print('Snapshot $snapshot');
+    Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
     log("User Data; $data");
     //log('User exist : ${snapshot.data().}');
     return UserModel(
-        // userId: data['uid'],
-        // name: data['name'],
-        // email: data['email'],
-        // descrption: data['description']
-        );
+        uid: data['uid'],
+        name: data['name'],
+        email: data['email'],
+        role: data['role']);
   }
 
   Future createBeacon(BeaconEstimote beaconEstimote,

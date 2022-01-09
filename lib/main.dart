@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_engineering_lab/constant/color_constant.dart';
+import 'package:smart_engineering_lab/services/database_services.dart';
 import 'package:smart_engineering_lab/services/local_notification_services.dart';
 import 'package:smart_engineering_lab/view/home/home_page_index.dart';
 import 'package:smart_engineering_lab/login_screens.dart';
@@ -92,6 +93,7 @@ class AuthWrapper extends StatelessWidget {
 
     print('This is firebase user : $firebaseUser');
     if (firebaseUser != null) {
+      DatabaseService(uid: firebaseUser.uid).readUserName;
       return const HomePageIndex();
     }
     return const LoginScreen();

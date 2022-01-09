@@ -103,10 +103,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   ],
                                 );
                               });
-                        }).whenComplete(() => Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) {
-                                  return const AuthWrapper();
-                                })));
+                        }).whenComplete(() {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return const AuthWrapper();
+                          }));
+                        });
                       }
                     }
                   },

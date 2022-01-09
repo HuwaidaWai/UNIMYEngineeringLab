@@ -108,8 +108,8 @@ class _HomePageIndexState extends State<HomePageIndex>
     if (!controller.authorizationStatusOk ||
         !controller.locationServiceEnabled ||
         !controller.bluetoothEnabled) {
-      print(
-          'RETURNED, authorizationStatusOk=${controller.authorizationStatusOk}, '
+      printError(info: 'Permission error');
+      print('authorizationStatusOk=${controller.authorizationStatusOk}, '
           'locationServiceEnabled=${controller.locationServiceEnabled}, '
           'bluetoothEnabled=${controller.bluetoothEnabled}');
       return;
@@ -129,6 +129,7 @@ class _HomePageIndexState extends State<HomePageIndex>
           print('Ranging Result $result');
           if (mounted) {
             setState(() {
+              print('Changes $listBeaconsGlobal');
               var _name = listBeaconsGlobal
                   .firstWhere(
                       (element) =>
@@ -143,6 +144,7 @@ class _HomePageIndexState extends State<HomePageIndex>
                     .toList();
                 regionBeacons[result.region] = beacons;
                 print('Map Region beacons $regionBeacons');
+                _name = null;
               }
             });
           }
@@ -179,7 +181,7 @@ class _HomePageIndexState extends State<HomePageIndex>
     streamBluetooth = flutterBeacon
         .bluetoothStateChanged()
         .listen((BluetoothState state) async {
-      print('Bluetooth ${state.toString()}');
+      print('Bluetooth state ${state.toString()}');
       controller.updateBluetoothState(state);
       await checkAllRequirements();
     });
@@ -217,10 +219,11 @@ class _HomePageIndexState extends State<HomePageIndex>
 
       //var first = await controller.startStream.length;
       initScanBeacon();
-      printInfo(info: 'Get stream ${controller.getStartScanning}');
+      printInfo(info: 'Get start stream value ${controller.getStartScanning}');
     } else {
       print('STATE NOT READY');
       controller.pauseScanning();
+      printInfo(info: 'Get pause stream value ${controller.getPauseScanning}');
     }
   }
 
@@ -329,7 +332,12 @@ class _HomePageIndexState extends State<HomePageIndex>
         controller: pageController,
         children: [
           const HomeScreen(),
-          BeaconScreen(isLoading: _isLoading, regionBeacons: regionBeacons),
+          StreamBuilder<List<BeaconEstimote>>(
+              stream: null,
+              builder: (context, snapshot) {
+                return BeaconScreen(
+                    isLoading: _isLoading, regionBeacons: regionBeacons);
+              }),
           const LabBookingScreen(),
           const ProfileScreen()
         ],
@@ -339,7 +347,7 @@ class _HomePageIndexState extends State<HomePageIndex>
           bottomTapped(val);
         },
         selectedBackgroundColor: Colors.black,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey[300],
         currentIndex: _bottomSelectedIndex,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.black,

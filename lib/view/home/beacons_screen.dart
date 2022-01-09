@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,6 +12,7 @@ import 'package:smart_engineering_lab/helper/rssi_signal_helper.dart';
 import 'package:smart_engineering_lab/model/beacons_model.dart';
 import 'package:smart_engineering_lab/model/beacons_view_model.dart';
 import 'package:smart_engineering_lab/model/region_view_model.dart';
+import 'package:smart_engineering_lab/model/user_model.dart';
 import 'package:smart_engineering_lab/services/database_services.dart';
 import 'package:smart_engineering_lab/view/old/admin_page.dart';
 import 'package:smart_engineering_lab/view/old/lab_module_views.dart';
@@ -279,7 +281,7 @@ class _BeaconScreenState extends State<BeaconScreen>
 
   @override
   Widget build(BuildContext context) {
-    // final firebaseUser = context.watch<User>();
+    final firebaseUser = context.watch<User>();
     return SingleChildScrollView(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 36.0),
@@ -310,23 +312,34 @@ class _BeaconScreenState extends State<BeaconScreen>
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(elevation: 0),
-                    onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => const Admin())),
-                    child: Row(
-                      children: const [
-                        Text('Add',
-                            style: TextStyle(
-                              fontSize: 18,
-                            )),
-                        Icon(Icons.add)
-                      ],
-                    ),
-                  ),
-                )
+                StreamBuilder<UserModel>(
+                    stream: DatabaseService(uid: firebaseUser.uid).readUserName,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: snapshot.data!.role == 'STUDENT'
+                              ? const SizedBox()
+                              : ElevatedButton(
+                                  style: ElevatedButton.styleFrom(elevation: 0),
+                                  onPressed: () => Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) => const Admin())),
+                                  child: Row(
+                                    children: const [
+                                      Text('Add',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                          )),
+                                      Icon(Icons.add)
+                                    ],
+                                  ),
+                                ),
+                        );
+                      } else {
+                        return Container();
+                      }
+                    })
               ],
             ),
             widget.regionBeacons.isEmpty && widget.isLoading == true
