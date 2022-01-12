@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:smart_engineering_lab/enum/view_state_enum.dart';
 import 'package:smart_engineering_lab/model/beacons_model.dart';
+import 'package:smart_engineering_lab/model/lab_booking_model.dart';
 import 'package:smart_engineering_lab/model/lab_module_model.dart';
 import 'package:smart_engineering_lab/model/user_model.dart';
 import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
@@ -24,6 +25,9 @@ class DatabaseService {
 
   final CollectionReference labModuleCollection =
       FirebaseFirestore.instance.collection('labModules');
+
+  final CollectionReference labBookingCollection =
+      FirebaseFirestore.instance.collection('labBooking');
 
 //USER DATA
   Future createUserData({
@@ -152,6 +156,41 @@ class DatabaseService {
                 }).toList());
           }).toList());
     }).toList();
+  }
+
+  Future createLabBooking(LabBookingModel labBookingModel) async {
+    try {
+      var id =
+          '${labBookingModel.date.toString()}.${labBookingModel.room}.${labBookingModel.slot}';
+      var docs = await labBookingCollection.where('id', isEqualTo: id).get();
+      var docEmpty = docs.docs.isEmpty;
+
+      if (docEmpty) {
+        labBookingModel.id = id;
+
+        await labBookingCollection
+            .doc(labBookingModel.id)
+            .set(labBookingModel.toJson());
+      } else {
+        throw Exception('Slot sudah diambil');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Stream<List<LabBookingModel>> listOfLabBookingForADay(DateTime? day) {
+    print('DAY : ${day.toString()}');
+    return labBookingCollection
+        .where('date', isEqualTo: Timestamp.fromDate(day!))
+        .snapshots()
+        .map((event) => event.docs
+            .map((e) => LabBookingModel(
+                id: e['id'],
+                room: e['room'],
+                date: DateTime.fromMillisecondsSinceEpoch(e['date'] * 1000),
+                slot: e['slot']))
+            .toList());
   }
 
   Stream<List<BeaconEstimote>> get listOfBeacons {
