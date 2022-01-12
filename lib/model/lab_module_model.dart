@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class LabModuleModel {
   String? nameModule;
   String? titleModule;
@@ -12,18 +14,75 @@ class LabModuleModel {
   }
 }
 
+class LabModuleViewModel {
+  TextEditingController? nameModule;
+  TextEditingController? titleModule;
+  List<SectionViewModel>? sections;
+  String? beaconId;
+  String? labModuleId;
+
+  LabModuleViewModel(
+      {this.nameModule,
+      this.titleModule,
+      this.sections,
+      this.beaconId,
+      this.labModuleId});
+  factory LabModuleViewModel.fromJson(Map data) {
+    return LabModuleViewModel(
+        nameModule: data['nameModule'],
+        titleModule: data['titleModule'],
+        sections: data['sections']);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'nameModule': nameModule!.text,
+      'titleModule': titleModule!.text,
+      'sections': sections!.map((e) => e.toJson()).toList(),
+      'beaconId': beaconId
+    };
+  }
+}
+
 class Section {
   String? titleSection;
   String? description;
-  List<Diagram>? diagramPath;
 
-  Section({this.titleSection, this.description, this.diagramPath});
+  Section({
+    this.titleSection,
+    this.description,
+  });
 
   factory Section.fromJson(Map data) {
     return Section(
-        titleSection: data['titleSection'],
-        description: data['description'],
-        diagramPath: data['diagramPath']);
+      titleSection: data['titleSection'],
+      description: data['description'],
+    );
+  }
+}
+
+class SectionViewModel {
+  TextEditingController? titleSection;
+  List<Description>? description;
+  // List<Diagram>? diagramPath;
+
+  SectionViewModel({
+    this.titleSection,
+    this.description,
+  });
+
+  factory SectionViewModel.fromJson(Map data) {
+    return SectionViewModel(
+      titleSection: data['titleSection'],
+      description: data['description'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'titleSection': titleSection!.text,
+      'description': description!.map((e) => e.toJson()).toList()
+    };
   }
 }
 
@@ -32,4 +91,16 @@ class Diagram {
   String? path;
 
   Diagram({this.title, this.path});
+}
+
+class Description {
+  String? type;
+  TextEditingController? description;
+  String? path;
+
+  Description({this.description, this.path, this.type});
+
+  Map<String, dynamic> toJson() {
+    return {'type': type, 'description': description!.text, 'path': path};
+  }
 }

@@ -14,6 +14,7 @@ import 'package:smart_engineering_lab/model/beacons_view_model.dart';
 import 'package:smart_engineering_lab/model/region_view_model.dart';
 import 'package:smart_engineering_lab/model/user_model.dart';
 import 'package:smart_engineering_lab/services/database_services.dart';
+import 'package:smart_engineering_lab/view/beacon_view/single_beacon_screen.dart';
 import 'package:smart_engineering_lab/view/old/admin_page.dart';
 import 'package:smart_engineering_lab/view/old/lab_module_views.dart';
 import 'package:smart_engineering_lab/view/old/requirement_state_controller.dart';
@@ -32,6 +33,10 @@ class BeaconScreen extends StatefulWidget {
 
 class _BeaconScreenState extends State<BeaconScreen>
     with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+  }
   // var listBeaconsGlobal = <BeaconEstimote>[];
   // final controller = Get.find<RequirementStateController>();
   // StreamSubscription<BluetoothState>? streamBluetooth;
@@ -347,31 +352,72 @@ class _BeaconScreenState extends State<BeaconScreen>
                 : widget.regionBeacons.isEmpty && widget.isLoading == false
                     ? const Center(child: Text('No Beacons'))
                     : GridView.count(
+                        childAspectRatio: 0.5,
                         shrinkWrap: true,
                         physics: const ClampingScrollPhysics(),
                         primary: false,
                         padding: const EdgeInsets.all(20),
-                        crossAxisSpacing: 10,
+                        crossAxisSpacing: 20,
                         mainAxisSpacing: 10,
                         crossAxisCount: 2,
                         children: widget.regionBeacons.entries.map(
                           (beacon) {
-                            return Card(
-                              child: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                child: beacon.value.isEmpty
-                                    ? const Text('Connecting to beacons')
-                                    : ListView.builder(
-                                        itemCount: beacon.value.length,
-                                        itemBuilder: (context, i) {
-                                          return Column(
-                                            children: [
-                                              Text(
-                                                beacon.value[i].name!,
-                                              ),
-                                            ],
-                                          );
-                                        }),
+                            return GestureDetector(
+                              onTap: () {
+                                if (beacon.value.isNotEmpty) {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => SingleBeaconScreen(
+                                          region: beacon.key,
+                                          beaconViewModel:
+                                              beacon.value.first)));
+                                }
+                              },
+                              child: Card(
+                                child: Container(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: beacon.value.isEmpty
+                                      ? const Text('Connecting to beacons')
+                                      : Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              decoration: const BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(8)),
+                                                  color: Colors.green),
+                                              height: 8,
+                                              width: 8,
+                                            ),
+                                            ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount: beacon.value.length,
+                                                itemBuilder: (context, i) {
+                                                  return Column(
+                                                    children: [
+                                                      Image.network(
+                                                        beacon.value[i]
+                                                            .pictureLink!,
+                                                        height: 80,
+                                                        width: 80,
+                                                      ),
+                                                      Text(
+                                                        beacon.value[i].name!,
+                                                      ),
+                                                      Text(RssiSignal
+                                                          .rssiTranslator(beacon
+                                                              .value[i]
+                                                              .beacon!
+                                                              .rssi)),
+                                                      Text(
+                                                          '${beacon.value[i].beacon!.accuracy.toString()} m'),
+                                                    ],
+                                                  );
+                                                }),
+                                          ],
+                                        ),
+                                ),
                               ),
                             );
                           },

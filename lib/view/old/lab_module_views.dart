@@ -20,31 +20,33 @@ class _LabModuleViewsState extends State<LabModuleViews> {
           titleModule: 'Analog Input',
           sections: [
             Section(
-                titleSection: 'Objective:',
-                description:
-                    'To demonstrate the reading analog input by using potentiometer and monitor the reading of analog value through serial monitor.',
-                diagramPath: []),
+              titleSection: 'Objective:',
+              description:
+                  'To demonstrate the reading analog input by using potentiometer and monitor the reading of analog value through serial monitor.',
+            ),
             Section(
-                titleSection: 'Modern tools/components:',
-                description: 'TinkerCAD tools. / UNO microcontroller',
-                diagramPath: []),
+              titleSection: 'Modern tools/components:',
+              description: 'TinkerCAD tools. / UNO microcontroller',
+            ),
             Section(
-                titleSection: 'Description:', description: '', diagramPath: []),
+              titleSection: 'Description:',
+              description: '',
+            ),
             Section(
-                titleSection: 'Activities',
-                description:
-                    '1) Based on the flow chart above, please write the source code for the working process\n2) State the components used.\n3) Attached the design circuit.\n4) Referring to activity (1), using\na) Serial.print ( ) to print the characters without going into new line and then continue adding the next statement or value. Voltage: 3.6 result will show in the serial monitor, example:\n\nfloat volts = analogRead(A0); volts = (volts*0.00488); Serial.print(“voltage : “); Serial.println(volts);\nb) Use if statement to compare the voltage value to execute certain tasks. In this example, when the voltage value is below 2.5, it prints out a message “Low Voltage!!”\nif (volts < 2.5) { Serial.print(“Low Voltage!!”); }',
-                diagramPath: []),
+              titleSection: 'Activities',
+              description:
+                  '1) Based on the flow chart above, please write the source code for the working process\n2) State the components used.\n3) Attached the design circuit.\n4) Referring to activity (1), using\na) Serial.print ( ) to print the characters without going into new line and then continue adding the next statement or value. Voltage: 3.6 result will show in the serial monitor, example:\n\nfloat volts = analogRead(A0); volts = (volts*0.00488); Serial.print(“voltage : “); Serial.println(volts);\nb) Use if statement to compare the voltage value to execute certain tasks. In this example, when the voltage value is below 2.5, it prints out a message “Low Voltage!!”\nif (volts < 2.5) { Serial.print(“Low Voltage!!”); }',
+            ),
             Section(
-                titleSection: 'Discussion',
-                description:
-                    'To demonstrate the reading analog input by using potentiometer and monitor the reading of analog value through serial monitor.',
-                diagramPath: []),
+              titleSection: 'Discussion',
+              description:
+                  'To demonstrate the reading analog input by using potentiometer and monitor the reading of analog value through serial monitor.',
+            ),
             Section(
-                titleSection: 'Conclusion',
-                description:
-                    'To demonstrate the reading analog input by using potentiometer and monitor the reading of analog value through serial monitor.',
-                diagramPath: [])
+              titleSection: 'Conclusion',
+              description:
+                  'To demonstrate the reading analog input by using potentiometer and monitor the reading of analog value through serial monitor.',
+            )
           ]);
     }, growable: true);
 

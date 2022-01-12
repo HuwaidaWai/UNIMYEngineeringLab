@@ -1,5 +1,5 @@
 class RssiSignal {
-  static rssiTranslator(int rssi) {
+  static String rssiTranslator(int rssi) {
     if (rssi >= -50) {
       return 'Excellent';
     } else if (rssi >= -60) {
@@ -10,8 +10,12 @@ class RssiSignal {
       return 'Low';
     } else if (rssi >= -90) {
       return 'Very Low';
+    } else if (rssi >= -100) {
+      return 'Extremely slow';
     } else if (rssi == 0) {
       return 'No Signal';
+    } else {
+      return 'Unknown';
     }
   }
 }

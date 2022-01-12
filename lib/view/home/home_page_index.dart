@@ -37,10 +37,12 @@ class _HomePageIndexState extends State<HomePageIndex>
   StreamSubscription<BluetoothState>? streamBluetooth;
   StreamSubscription<RangingResult>? streamRanging;
   final regionBeacons = <Region, List<BeaconViewModel>>{};
-  var beacons = <BeaconViewModel>[];
+  var beaconsViewModels = <BeaconViewModel>[];
+  var resultRegion = <Region>[];
   var regions = <Region>[];
 
   bool _isLoading = true;
+
   @override
   void initState() {
     WidgetsBinding.instance?.addObserver(this);
@@ -67,21 +69,21 @@ class _HomePageIndexState extends State<HomePageIndex>
     DatabaseService().listOfBeacons.listen((listBeacons) {
       print('listBeacons $listBeacons');
       if (listBeacons.isNotEmpty) {
-        if (changeNotifier.getPushedNotification == false) {
-          var remoteNotificationLaporJumlah =
-              firebaseMessaging.RemoteNotification(
-                  title: 'New beacons detected!',
-                  body: 'There are ${listBeacons.length} nearest');
-          NotificationService().showNotification(
-            remoteNotificationLaporJumlah,
-          );
-          changeNotifier.setPushedNotification(true);
-        }
+        // if (changeNotifier.getPushedNotification == false) {
+        //   var remoteNotificationLaporJumlah =
+        //       firebaseMessaging.RemoteNotification(
+        //           title: 'New beacons detected!',
+        //           body: 'There are ${listBeacons.length} nearest');
+        //   NotificationService().showNotification(
+        //     remoteNotificationLaporJumlah,
+        //   );
+        //   changeNotifier.setPushedNotification(true);
+        // }
 
         setState(() {
           listBeaconsGlobal = listBeacons;
         });
-
+        regions.clear();
         for (var e in listBeacons) {
           regions.add(Region(
               identifier: e.identifier!,
@@ -122,29 +124,87 @@ class _HomePageIndexState extends State<HomePageIndex>
       }
     }
 
-    controller.regionList.listen((event) {
-      if (event.isNotEmpty) {
+    controller.regionList.listen((eventRegion) {
+      print('Region beacons $eventRegion');
+      if (eventRegion.isNotEmpty) {
         streamRanging =
-            flutterBeacon.ranging(event).listen((RangingResult result) {
+            flutterBeacon.ranging(eventRegion).listen((RangingResult result) {
           print('Ranging Result $result');
           if (mounted) {
             setState(() {
-              print('Changes $listBeaconsGlobal');
-              var _name = listBeaconsGlobal
-                  .firstWhere(
-                      (element) =>
-                          element.identifier == result.region.identifier,
-                      orElse: () => BeaconEstimote(name: null))
-                  .name;
-              //Found Name
-              print('Name : $_name');
-              if (_name != null) {
-                beacons = result.beacons
-                    .map((e) => BeaconViewModel(beacon: e, name: _name))
-                    .toList();
-                regionBeacons[result.region] = beacons;
+              for (var rangingBeaconsGlobal in listBeaconsGlobal) {
+                var _major = rangingBeaconsGlobal.toJson()["major"];
+                if (result.beacons.isNotEmpty &&
+                    (_major == result.beacons.first.major)) {
+                  print('link: ${rangingBeaconsGlobal.pictureLink}');
+                  var _beaconsViewModels = BeaconViewModel(
+                      beacon: result.beacons.firstWhere((element) =>
+                          element.major == rangingBeaconsGlobal.major! &&
+                          element.minor == rangingBeaconsGlobal.minor!),
+                      name: rangingBeaconsGlobal.name,
+                      pictureLink: rangingBeaconsGlobal.pictureLink);
+                  //TODO:
+                  ///
+                  /// Show notification if nearby
+                  ///
+
+                  if (_beaconsViewModels.beacon != null) {
+                    if (_beaconsViewModels.beacon!.accuracy <= 1.0) {
+                      var remoteNotificationLaporJumlah =
+                          firebaseMessaging.RemoteNotification(
+                              title: 'New beacons detected!',
+                              body: '${_beaconsViewModels.name} is nearest');
+                      NotificationService().showNotification(
+                        remoteNotificationLaporJumlah,
+                      );
+                    }
+                  }
+
+                  beaconsViewModels.addIf(
+                      beaconsViewModels.firstWhereOrNull((element) =>
+                              _beaconsViewModels.beacon?.major ==
+                              element.beacon?.major) ==
+                          null,
+                      _beaconsViewModels);
+                  resultRegion.addIf(
+                      resultRegion.firstWhereOrNull((element) =>
+                              result.region.major == element.major) ==
+                          null,
+                      result.region);
+                  // regionBeacons.update(result.region, (value) => null);
+                  regionBeacons[result.region] = [_beaconsViewModels];
+                }
+
+                regionBeacons.removeWhere((key, value) =>
+                    listBeaconsGlobal.firstWhereOrNull(
+                        (element) => element.identifier == key.identifier) ==
+                    null);
+
+                print('beacons view model: $beaconsViewModels');
                 print('Map Region beacons $regionBeacons');
-                _name = null;
+                // var _name = listBeaconsGlobal
+                //     .firstWhere(
+                //         (element) =>
+                //             element.identifier == result.region.identifier,
+                //         orElse: () => BeaconEstimote(name: null))
+                //     .name;
+
+                // print('Name get from global beacons var $_name');
+                // if (_name != null) {
+                //   beacons = result.beacons
+                //       .map((e) => BeaconViewModel(beacon: e, name: _name))
+                //       .toList();
+                //   regionBeacons.removeWhere((key, value) =>
+                //       (beacons.isEmpty) && beacons.first.name == null);
+                //   regionBeacons[result.region] = beacons;
+
+                //   if (beacons.isNotEmpty) {
+                //     printInfo(
+                //         info:
+                //             'Name first beacons detected : ${beacons.first.name}');
+                //   }
+                //   print('Map Region beacons $regionBeacons');
+                // }
               }
             });
           }
@@ -159,9 +219,9 @@ class _HomePageIndexState extends State<HomePageIndex>
 
   pauseScanBeacon() async {
     streamRanging?.pause();
-    if (beacons.isNotEmpty) {
+    if (beaconsViewModels.isNotEmpty) {
       setState(() {
-        beacons.clear();
+        beaconsViewModels.clear();
       });
     }
   }
@@ -333,12 +393,7 @@ class _HomePageIndexState extends State<HomePageIndex>
         controller: pageController,
         children: [
           const HomeScreen(),
-          StreamBuilder<List<BeaconEstimote>>(
-              stream: null,
-              builder: (context, snapshot) {
-                return BeaconScreen(
-                    isLoading: _isLoading, regionBeacons: regionBeacons);
-              }),
+          BeaconScreen(isLoading: _isLoading, regionBeacons: regionBeacons),
           const LabBookingScreen(),
           const ProfileScreen()
         ],
