@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:smart_engineering_lab/constant/color_constant.dart';
 import 'package:smart_engineering_lab/helper/rssi_signal_helper.dart';
 import 'package:smart_engineering_lab/model/beacons_model.dart';
 import 'package:smart_engineering_lab/model/beacons_view_model.dart';
@@ -35,7 +36,6 @@ class _BeaconScreenState extends State<BeaconScreen>
     with WidgetsBindingObserver {
   @override
   void initState() {
-    //TODO: Fix ui for the ranging beacon screen
     super.initState();
   }
   // var listBeaconsGlobal = <BeaconEstimote>[];
@@ -353,7 +353,7 @@ class _BeaconScreenState extends State<BeaconScreen>
                 : widget.regionBeacons.isEmpty && widget.isLoading == false
                     ? const Center(child: Text('No Beacons'))
                     : GridView.count(
-                        childAspectRatio: 0.5,
+                        childAspectRatio: 0.6,
                         shrinkWrap: true,
                         physics: const ClampingScrollPhysics(),
                         primary: false,
@@ -391,31 +391,47 @@ class _BeaconScreenState extends State<BeaconScreen>
                                               height: 8,
                                               width: 8,
                                             ),
-                                            ListView.builder(
-                                                shrinkWrap: true,
-                                                itemCount: beacon.value.length,
-                                                itemBuilder: (context, i) {
-                                                  return Column(
-                                                    children: [
-                                                      Image.network(
-                                                        beacon.value[i]
-                                                            .pictureLink!,
-                                                        height: 80,
-                                                        width: 80,
+                                            Expanded(
+                                              child: ListView.builder(
+                                                  shrinkWrap: true,
+                                                  itemCount:
+                                                      beacon.value.length,
+                                                  itemBuilder: (context, i) {
+                                                    return Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Image.network(
+                                                            beacon.value[i]
+                                                                .pictureLink!,
+                                                            height: 80,
+                                                            width: 80,
+                                                          ),
+                                                          Text(
+                                                            'Name : ${beacon.value[i].name!}',
+                                                            style:
+                                                                subtitleStyle2Small,
+                                                          ),
+                                                          Text(
+                                                            'Signal: ${RssiSignal.rssiTranslator(beacon.value[i].beacon!.rssi)}',
+                                                            style:
+                                                                subtitleStyle2Small,
+                                                          ),
+                                                          Text(
+                                                            'Distance:  ${beacon.value[i].beacon!.accuracy.toString()} m',
+                                                            style:
+                                                                subtitleStyle2Small,
+                                                          ),
+                                                        ],
                                                       ),
-                                                      Text(
-                                                        beacon.value[i].name!,
-                                                      ),
-                                                      Text(RssiSignal
-                                                          .rssiTranslator(beacon
-                                                              .value[i]
-                                                              .beacon!
-                                                              .rssi)),
-                                                      Text(
-                                                          '${beacon.value[i].beacon!.accuracy.toString()} m'),
-                                                    ],
-                                                  );
-                                                }),
+                                                    );
+                                                  }),
+                                            ),
                                           ],
                                         ),
                                 ),

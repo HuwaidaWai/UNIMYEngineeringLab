@@ -24,5 +24,8 @@ TextStyle subtitleStyle =
 TextStyle subtitleStyle2 =
     GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.normal);
 
+TextStyle subtitleStyle2Small =
+    GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.normal);
+
 TextStyle subtitleStyle3 =
     GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.w300);

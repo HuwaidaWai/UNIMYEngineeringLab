@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:smart_engineering_lab/constant/color_constant.dart';
 import 'package:smart_engineering_lab/model/beacons_view_model.dart';
 import 'package:smart_engineering_lab/model/lab_module_model.dart';
 import 'package:smart_engineering_lab/model/user_model.dart';
@@ -23,12 +25,18 @@ class SingleBeaconScreen extends StatefulWidget {
 class _SingleBeaconScreenState extends State<SingleBeaconScreen> {
   @override
   Widget build(BuildContext context) {
-    //TODO: Fix ui
     final firebaseUser = context.watch<User>();
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.beaconViewModel.name!),
-      ),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const FaIcon(
+                FontAwesomeIcons.chevronLeft,
+                color: Colors.white,
+              )),
+          title: Text(widget.beaconViewModel.name!, style: titleStyle)),
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(16),
@@ -37,7 +45,10 @@ class _SingleBeaconScreenState extends State<SingleBeaconScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Lab Report'),
+                  Text(
+                    'Lab Report',
+                    style: subtitleStyle,
+                  ),
                   StreamBuilder<UserModel>(
                       stream:
                           DatabaseService(uid: firebaseUser.uid).readUserName,
@@ -56,12 +67,9 @@ class _SingleBeaconScreenState extends State<SingleBeaconScreen> {
                                                 beaconId:
                                                     widget.region.identifier))),
                                     child: Row(
-                                      children: const [
-                                        Text('Add',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                            )),
-                                        Icon(Icons.add)
+                                      children: [
+                                        Text('Add', style: subtitleStyle2),
+                                        const Icon(Icons.add)
                                       ],
                                     ),
                                   ),
@@ -97,21 +105,59 @@ class _SingleBeaconScreenState extends State<SingleBeaconScreen> {
                                                   labModuleModel: data[i])));
                                 },
                                 child: Card(
-                                  child: Row(
-                                    children: [
-                                      Column(
-                                        children: [
-                                          Text(data[i].nameModule!.text),
-                                          Text(data[i].titleModule!.text),
-                                        ],
-                                      ),
-                                      IconButton(
-                                          onPressed: () {
-                                            DatabaseService().deleteLabModule(
-                                                data[i].labModuleId!);
-                                          },
-                                          icon: const Icon(Icons.delete))
-                                    ],
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              data[i].nameModule!.text,
+                                              style: subtitleStyle,
+                                            ),
+                                            Text(
+                                              data[i].titleModule!.text,
+                                              style: subtitleStyle2,
+                                            ),
+                                          ],
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      title: Text(
+                                                        'Are you sure want to delete?',
+                                                        style: subtitleStyle2,
+                                                      ),
+                                                      actions: [
+                                                        ElevatedButton(
+                                                            onPressed: () {
+                                                              DatabaseService()
+                                                                  .deleteLabModule(
+                                                                      data[i]
+                                                                          .labModuleId!);
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            child: Text(
+                                                              'Yes',
+                                                              style:
+                                                                  subtitleStyle2,
+                                                            ))
+                                                      ],
+                                                    );
+                                                  });
+                                            },
+                                            icon: const Icon(Icons.delete))
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );

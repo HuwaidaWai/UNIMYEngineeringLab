@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:smart_engineering_lab/constant/color_constant.dart';
 import 'package:smart_engineering_lab/model/lab_module_model.dart';
 
 class LabModuleScreenNew extends StatefulWidget {
@@ -16,7 +18,18 @@ class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
     //TODO: Fix lab module screens
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.labModuleModel.nameModule!.text),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const FaIcon(
+              FontAwesomeIcons.chevronLeft,
+              color: Colors.white,
+            )),
+        title: Text(
+          widget.labModuleModel.nameModule!.text,
+          style: subtitleStyle,
+        ),
       ),
       body: SingleChildScrollView(
           child: Container(

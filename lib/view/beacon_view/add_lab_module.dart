@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart' as p;
+import 'package:smart_engineering_lab/constant/color_constant.dart';
 import 'package:smart_engineering_lab/model/lab_module_model.dart';
 import 'package:smart_engineering_lab/services/database_services.dart';
 
@@ -15,15 +17,25 @@ class AddLabModule extends StatefulWidget {
 }
 
 class _AddLabModuleState extends State<AddLabModule> {
+  //TODO: Fix delete button
   var listOfController = LabModuleViewModel(
       nameModule: TextEditingController(),
       titleModule: TextEditingController(),
       sections: [
+        SectionViewModel(
+            titleSection: TextEditingController(), description: []),
+        SectionViewModel(
+            titleSection: TextEditingController(), description: []),
+        SectionViewModel(
+            titleSection: TextEditingController(), description: []),
+        SectionViewModel(
+            titleSection: TextEditingController(), description: []),
+        SectionViewModel(
+            titleSection: TextEditingController(), description: []),
         SectionViewModel(titleSection: TextEditingController(), description: [])
       ]);
   @override
   void initState() {
-    //TODO: Fix ui for the add lab module
     super.initState();
   }
 
@@ -31,7 +43,18 @@ class _AddLabModuleState extends State<AddLabModule> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Lab Module'),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const FaIcon(
+              FontAwesomeIcons.chevronLeft,
+              color: Colors.white,
+            )),
+        title: Text(
+          'Add Lab Module',
+          style: titleStyle,
+        ),
       ),
       body: SingleChildScrollView(
           child: Container(
@@ -49,17 +72,20 @@ class _AddLabModuleState extends State<AddLabModule> {
               false,
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Section'),
-                IconButton(
-                    onPressed: () {
-                      setState(() {
-                        listOfController.sections!.add(SectionViewModel(
-                            titleSection: TextEditingController(),
-                            description: []));
-                      });
-                    },
-                    icon: const Icon(Icons.add))
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      listOfController.sections!.add(SectionViewModel(
+                          titleSection: TextEditingController(),
+                          description: []));
+                    });
+                  },
+                  child: const Icon(Icons.add),
+                  style: ElevatedButton.styleFrom(elevation: 0),
+                )
               ],
             ),
             ListView.builder(
@@ -71,6 +97,13 @@ class _AddLabModuleState extends State<AddLabModule> {
                       child: Column(
                         children: [
                           TextFormField(
+                            decoration: InputDecoration(
+                                label: Text(
+                                  'Section',
+                                  style: subtitleStyle2,
+                                ),
+                                border: const OutlineInputBorder(
+                                    borderSide: BorderSide(width: 1.0))),
                             controller:
                                 listOfController.sections![index].titleSection,
                           ),
@@ -89,9 +122,12 @@ class _AddLabModuleState extends State<AddLabModule> {
                                     });
                                   },
                                   child: Row(
-                                    children: const [
-                                      Text('Add Text'),
-                                      Icon(Icons.add),
+                                    children: [
+                                      Text(
+                                        'Add Text',
+                                        style: subtitleStyle2,
+                                      ),
+                                      const Icon(Icons.add),
                                     ],
                                   )),
                               const SizedBox(
@@ -106,9 +142,12 @@ class _AddLabModuleState extends State<AddLabModule> {
                                     });
                                   },
                                   child: Row(
-                                    children: const [
-                                      Text('Add Diagram'),
-                                      Icon(Icons.add),
+                                    children: [
+                                      Text(
+                                        'Add Diagram',
+                                        style: subtitleStyle2,
+                                      ),
+                                      const Icon(Icons.add),
                                     ],
                                   ))
                             ],
@@ -180,7 +219,10 @@ class _AddLabModuleState extends State<AddLabModule> {
                   listOfController.beaconId = widget.beaconId;
                   DatabaseService().createLabModule(listOfController);
                 },
-                child: const Text('Submit'))
+                child: Text(
+                  'Submit',
+                  style: subtitleStyle2,
+                ))
           ],
         ),
       )),
@@ -217,7 +259,11 @@ class _AddLabModuleState extends State<AddLabModule> {
             child: Center(
               child: path == null
                   ? OutlinedButton(
-                      child: const Text('Pick File'), onPressed: onPressed)
+                      child: Text(
+                        'Pick File',
+                        style: subtitleStyle2Small,
+                      ),
+                      onPressed: onPressed)
                   : Image.file(
                       File(path),
                       height: 100,
@@ -253,7 +299,10 @@ class _AddLabModuleState extends State<AddLabModule> {
               controller: controller,
               maxLines: isDescription ? null : 1,
               decoration: InputDecoration(
-                  label: Text(label),
+                  label: Text(
+                    label,
+                    style: subtitleStyle2,
+                  ),
                   border: const OutlineInputBorder(
                       borderSide: BorderSide(width: 1.0))),
             ),

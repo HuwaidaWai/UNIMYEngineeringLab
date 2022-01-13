@@ -3,9 +3,11 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
+import 'package:smart_engineering_lab/constant/color_constant.dart';
 import 'package:smart_engineering_lab/enum/view_state_enum.dart';
 import 'package:smart_engineering_lab/main.dart';
 import 'package:smart_engineering_lab/model/beacons_model.dart';
@@ -26,13 +28,13 @@ class _AdminState extends State<Admin> {
   final uuidTextController = TextEditingController();
   final majorTextController = TextEditingController();
   final minorTextController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
   // final storage = GetStorage('iBeacons');
   String? path;
   Map dataToUpload = {'destination': null, 'file': null};
 
   @override
   void initState() {
-    // TODO: Fix ui
     super.initState();
   }
 
@@ -102,51 +104,95 @@ class _AdminState extends State<Admin> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          height: MediaQuery.of(context).size.height,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              buildImageContainer(),
-              TextFormField(
-                controller: nameTextController,
-                decoration: const InputDecoration(hintText: 'Name'),
-              ),
-              TextFormField(
-                controller: idTextController,
-                decoration: const InputDecoration(hintText: 'Identifier'),
-              ),
-              TextFormField(
-                controller: uuidTextController,
-                decoration: const InputDecoration(hintText: 'ProximityUUID'),
-              ),
-              TextFormField(
-                keyboardType: TextInputType.number,
-                controller: majorTextController,
-                decoration: const InputDecoration(hintText: 'Major'),
-              ),
-              TextFormField(
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(hintText: 'Minor'),
-                controller: minorTextController,
-              ),
-              Container(
-                  margin: const EdgeInsets.only(top: 20),
-                  padding: const EdgeInsets.symmetric(vertical: 40),
-                  width: double.infinity,
-                  child: LoginButtonWidget(
-                      // style: ElevatedButton.styleFrom(),
-                      onPressed: _onSubmit,
-                      child: changeNotifier.getViewState == ViewState.BUSY
-                          ? const CircularProgressIndicator(
-                              color: Colors.white,
-                            )
-                          : const Text('Submit'))),
-              // LoginButtonWidget(
-              //     // style: ElevatedButton.styleFrom(),
-              //     onPressed: _onDelete,
-              //     child: const Text('Delete'))
-            ],
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    children: [
+                      IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          icon: const FaIcon(FontAwesomeIcons.chevronLeft))
+                    ],
+                  ),
+                ),
+                buildImageContainer(),
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '*This field is required';
+                    }
+                    return null;
+                  },
+                  controller: nameTextController,
+                  decoration: const InputDecoration(hintText: 'Name'),
+                ),
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '*This field is required';
+                    }
+                    return null;
+                  },
+                  controller: idTextController,
+                  decoration: const InputDecoration(hintText: 'Identifier'),
+                ),
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '*This field is required';
+                    }
+                    return null;
+                  },
+                  controller: uuidTextController,
+                  decoration: const InputDecoration(hintText: 'ProximityUUID'),
+                ),
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '*This field is required';
+                    }
+                    return null;
+                  },
+                  keyboardType: TextInputType.number,
+                  controller: majorTextController,
+                  decoration: const InputDecoration(hintText: 'Major'),
+                ),
+                TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '*This field is required';
+                    }
+                    return null;
+                  },
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(hintText: 'Minor'),
+                  controller: minorTextController,
+                ),
+                Container(
+                    margin: const EdgeInsets.only(top: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 40),
+                    width: double.infinity,
+                    child: LoginButtonWidget(
+                        // style: ElevatedButton.styleFrom(),
+                        onPressed: _onSubmit,
+                        child: changeNotifier.getViewState == ViewState.BUSY
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : const Text('Submit'))),
+                // LoginButtonWidget(
+                //     // style: ElevatedButton.styleFrom(),
+                //     onPressed: _onDelete,
+                //     child: const Text('Delete'))
+              ],
+            ),
           ),
         ),
       ),
@@ -160,17 +206,40 @@ class _AdminState extends State<Admin> {
   }
 
   _onSubmit() async {
-    final changeNotifier = context.read<RootChangeNotifier>();
-    Map data = {
-      'identifier': idTextController.text,
-      'name': nameTextController.text,
-      'uuid': uuidTextController.text,
-      'major': int.parse(majorTextController.text),
-      'minor': int.parse(minorTextController.text)
-    };
-    var beaconEstimote = BeaconEstimote.fromJson(data);
+    if (_formKey.currentState!.validate()) {
+      final changeNotifier = context.read<RootChangeNotifier>();
+      Map data = {
+        'identifier': idTextController.text,
+        'name': nameTextController.text,
+        'uuid': uuidTextController.text,
+        'major': int.parse(majorTextController.text),
+        'minor': int.parse(minorTextController.text)
+      };
+      var beaconEstimote = BeaconEstimote.fromJson(data);
 
-    DatabaseService().createBeacon(beaconEstimote, changeNotifier, File(path!));
-    Navigator.of(context).pop();
+      DatabaseService()
+          .createBeacon(beaconEstimote, changeNotifier, File(path!));
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(
+                'Success add beacon',
+                style: titleStyle,
+              ),
+              actions: [
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Okay',
+                      style: subtitleStyle,
+                    ))
+              ],
+            );
+          });
+    }
   }
 }
