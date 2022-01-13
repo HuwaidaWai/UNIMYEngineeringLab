@@ -123,57 +123,92 @@ class _AdminState extends State<Admin> {
                   ),
                 ),
                 buildImageContainer(),
-                TextFormField(
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '*This field is required';
-                    }
-                    return null;
-                  },
-                  controller: nameTextController,
-                  decoration: const InputDecoration(hintText: 'Name'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return '*This field is required';
+                      }
+                      return null;
+                    },
+                    controller: nameTextController,
+                    decoration: InputDecoration(
+                        hintText: 'Name',
+                        hintStyle: subtitleStyle2Small,
+                        border: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.0))),
+                  ),
                 ),
-                TextFormField(
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '*This field is required';
-                    }
-                    return null;
-                  },
-                  controller: idTextController,
-                  decoration: const InputDecoration(hintText: 'Identifier'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return '*This field is required';
+                      }
+                      return null;
+                    },
+                    controller: idTextController,
+                    decoration: InputDecoration(
+                        hintText: 'Identifier',
+                        hintStyle: subtitleStyle2Small,
+                        border: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.0))),
+                  ),
                 ),
-                TextFormField(
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '*This field is required';
-                    }
-                    return null;
-                  },
-                  controller: uuidTextController,
-                  decoration: const InputDecoration(hintText: 'ProximityUUID'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return '*This field is required';
+                      }
+                      return null;
+                    },
+                    controller: uuidTextController,
+                    decoration: InputDecoration(
+                        hintText: 'ProximityUUID',
+                        hintStyle: subtitleStyle2Small,
+                        border: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.0))),
+                  ),
                 ),
-                TextFormField(
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '*This field is required';
-                    }
-                    return null;
-                  },
-                  keyboardType: TextInputType.number,
-                  controller: majorTextController,
-                  decoration: const InputDecoration(hintText: 'Major'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return '*This field is required';
+                      }
+                      return null;
+                    },
+                    keyboardType: TextInputType.number,
+                    controller: majorTextController,
+                    decoration: InputDecoration(
+                        hintText: 'Major',
+                        hintStyle: subtitleStyle2Small,
+                        border: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.0))),
+                  ),
                 ),
-                TextFormField(
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '*This field is required';
-                    }
-                    return null;
-                  },
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(hintText: 'Minor'),
-                  controller: minorTextController,
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return '*This field is required';
+                      }
+                      return null;
+                    },
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                        hintText: 'Minor',
+                        hintStyle: subtitleStyle2Small,
+                        border: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.0))),
+                    controller: minorTextController,
+                  ),
                 ),
                 Container(
                     margin: const EdgeInsets.only(top: 20),
