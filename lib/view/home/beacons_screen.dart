@@ -35,6 +35,7 @@ class _BeaconScreenState extends State<BeaconScreen>
     with WidgetsBindingObserver {
   @override
   void initState() {
+    //TODO: Fix ui for the ranging beacon screen
     super.initState();
   }
   // var listBeaconsGlobal = <BeaconEstimote>[];

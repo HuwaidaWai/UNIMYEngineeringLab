@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
+import 'package:smart_engineering_lab/constant/color_constant.dart';
 import 'package:smart_engineering_lab/enum/view_state_enum.dart';
 import 'package:smart_engineering_lab/model/lab_booking_model.dart';
 import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
@@ -47,9 +48,8 @@ class _LabBookingScreenState extends State<LabBookingScreen> {
   var listForADaySubscription;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    // _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay));
+    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay));
     // listForADaySubscription =
     //     DatabaseService().listOfLabBookingForADay(_selectedDay).listen((event) {
     //   _selectedEvents =
@@ -72,26 +72,27 @@ class _LabBookingScreenState extends State<LabBookingScreen> {
       if (_selectedDay != null) {
         daySelected = true;
       }
-      // listForADaySubscription = DatabaseService()
-      //     .listOfLabBookingForADay(_selectedDay)
-      //     .listen((event) {
-      //   _selectedEvents =
-      //       ValueNotifier(_getEventsForDay(_selectedDay, list: event));
-      // });
-      _selectedEvents.value = _getEventsForDay(selectedDay);
+      // var selectedDayFromDb;
+      print('VALUE LISTENER BUILDER : ${selectedDay.toString()}');
+      DatabaseService().listOfLabBookingForADay(selectedDay).listen((event) {
+        _selectedEvents.value = _getEventsForDay(selectedDay, list: event);
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final firebaseUser = context.read<User>();
     final changeNotifier = context.read<RootChangeNotifier>();
     return SingleChildScrollView(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 36.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Lab Booking'),
+            Text(
+              'Lab Booking',
+              style: titleStyle,
+            ),
             Column(
               children: [
                 const Text('Lab Room'),
@@ -125,8 +126,8 @@ class _LabBookingScreenState extends State<LabBookingScreen> {
               children: [
                 const Text('Date'),
                 TableCalendar(
-                  // eventLoader: (day){
-                  //   return
+                  // eventLoader: (day) {
+                  //   return _getEventsForDay(day, list: _selectedEvents.value);
                   // },
                   calendarStyle: const CalendarStyle(
                       selectedDecoration: BoxDecoration(
@@ -149,6 +150,39 @@ class _LabBookingScreenState extends State<LabBookingScreen> {
                   },
                 )
               ],
+            ),
+            ValueListenableBuilder<List<LabBookingModel>>(
+              valueListenable: _selectedEvents,
+              builder: (context, value, _) {
+                print('VALUE LISTENER BUILDER : $value');
+                return Column(
+                  children: [
+                    value.isNotEmpty
+                        ? Text('Booked slots for $_selectedDay.')
+                        : Text('No slots booked for $_selectedDay.'),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: value.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 12.0,
+                            vertical: 4.0,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          child: ListTile(
+                            onTap: () => print('${value[index]}'),
+                            title: Text('${value[index].slot}'),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,43 +235,18 @@ class _LabBookingScreenState extends State<LabBookingScreen> {
                 )
               ],
             ),
-            // ValueListenableBuilder<List<LabBookingModel>>(
-            //   valueListenable: _selectedEvents,
-            //   builder: (context, value, _) {
-            //     print('VALUE LISTENER BUILDER : $value');
-            //     return ListView.builder(
-            //       shrinkWrap: true,
-            //       itemCount: value.length,
-            //       itemBuilder: (context, index) {
-            //         return Container(
-            //           margin: const EdgeInsets.symmetric(
-            //             horizontal: 12.0,
-            //             vertical: 4.0,
-            //           ),
-            //           decoration: BoxDecoration(
-            //             border: Border.all(),
-            //             borderRadius: BorderRadius.circular(12.0),
-            //           ),
-            //           child: ListTile(
-            //             onTap: () => print('${value[index]}'),
-            //             title: Text('${value[index].slot}'),
-            //           ),
-            //         );
-            //       },
-            //     );
-            //   },
-            // ),
             LoginButtonWidget(
                 onPressed: () async {
                   if (daySelected && timeSlotSelected && labRoomSelected) {
+                    final firebaseUser = context.read<User>();
                     print(
-                        'ROOM :$room, TIMESLOT: $timeSlot, DATE: ${_selectedDay.toString()}');
+                        'ROOM :$room, TIMESLOT: $timeSlot, DATE: ${_selectedDay.toString()} displayname : ${firebaseUser.displayName}');
 
                     await DatabaseService()
                         .createLabBooking(LabBookingModel(
                             room: room,
                             slot: timeSlot,
-                            date: _selectedDay,
+                            date: _selectedDay.toString(),
                             userId: firebaseUser.displayName))
                         .catchError((e) {
                       showDialog(

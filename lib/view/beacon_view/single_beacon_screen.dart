@@ -23,6 +23,7 @@ class SingleBeaconScreen extends StatefulWidget {
 class _SingleBeaconScreenState extends State<SingleBeaconScreen> {
   @override
   Widget build(BuildContext context) {
+    //TODO: Fix ui
     final firebaseUser = context.watch<User>();
     return Scaffold(
       appBar: AppBar(

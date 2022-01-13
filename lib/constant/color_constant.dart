@@ -13,3 +13,6 @@ Map<int, Color> color = {
   900: const Color.fromRGBO(136, 14, 79, 1),
 };
 MaterialColor colorCustom = MaterialColor(0xffd10e48, color);
+
+TextStyle titleStyle =
+    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold);

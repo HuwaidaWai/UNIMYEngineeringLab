@@ -143,13 +143,14 @@ class _HomePageIndexState extends State<HomePageIndex>
                           element.minor == rangingBeaconsGlobal.minor!),
                       name: rangingBeaconsGlobal.name,
                       pictureLink: rangingBeaconsGlobal.pictureLink);
-                  //TODO:
+
                   ///
                   /// Show notification if nearby
                   ///
 
                   if (_beaconsViewModels.beacon != null) {
                     if (_beaconsViewModels.beacon!.accuracy <= 1.0) {
+                      //TODO: Add notifier for notification
                       var remoteNotificationLaporJumlah =
                           firebaseMessaging.RemoteNotification(
                               title: 'New beacons detected!',

@@ -12,7 +12,6 @@ class _LabModuleViewsState extends State<LabModuleViews> {
   List<LabModuleModel> labmodule = [];
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     labmodule = List.generate(14, (index) {
       return LabModuleModel(

@@ -23,6 +23,7 @@ class _AddLabModuleState extends State<AddLabModule> {
       ]);
   @override
   void initState() {
+    //TODO: Fix ui for the add lab module
     super.initState();
   }
 

@@ -179,17 +179,14 @@ class DatabaseService {
     }
   }
 
-  Stream<List<LabBookingModel>> listOfLabBookingForADay(DateTime? day) {
+  Stream<List<LabBookingModel>> listOfLabBookingForADay(DateTime day) {
     print('DAY : ${day.toString()}');
     return labBookingCollection
-        .where('date', isEqualTo: Timestamp.fromDate(day!))
+        .where('date', isEqualTo: day.toString())
         .snapshots()
         .map((event) => event.docs
             .map((e) => LabBookingModel(
-                id: e['id'],
-                room: e['room'],
-                date: DateTime.fromMillisecondsSinceEpoch(e['date'] * 1000),
-                slot: e['slot']))
+                id: e['id'], room: e['room'], date: e['date'], slot: e['slot']))
             .toList());
   }
 

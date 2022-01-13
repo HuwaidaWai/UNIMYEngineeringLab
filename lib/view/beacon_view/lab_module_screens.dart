@@ -13,6 +13,7 @@ class LabModuleScreenNew extends StatefulWidget {
 class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
   @override
   Widget build(BuildContext context) {
+    //TODO: Fix lab module screens
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.labModuleModel.nameModule!.text),

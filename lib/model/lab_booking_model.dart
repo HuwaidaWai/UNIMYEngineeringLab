@@ -1,7 +1,7 @@
 class LabBookingModel {
   String? id;
   String? room;
-  DateTime? date;
+  String? date;
   String? slot;
   String? userId;
 
