@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Map<int, Color> color = {
   50: const Color.fromRGBO(136, 14, 79, .1),
@@ -15,4 +16,13 @@ Map<int, Color> color = {
 MaterialColor colorCustom = MaterialColor(0xffd10e48, color);
 
 TextStyle titleStyle =
-    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold);
+    GoogleFonts.montserrat(fontSize: 24, fontWeight: FontWeight.bold);
+
+TextStyle subtitleStyle =
+    GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.bold);
+
+TextStyle subtitleStyle2 =
+    GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.normal);
+
+TextStyle subtitleStyle3 =
+    GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.w300);

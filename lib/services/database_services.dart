@@ -158,8 +158,10 @@ class DatabaseService {
     }).toList();
   }
 
-  Future createLabBooking(LabBookingModel labBookingModel) async {
+  Future createLabBooking(LabBookingModel labBookingModel,
+      RootChangeNotifier changeNotifier) async {
     try {
+      changeNotifier.setState(ViewState.BUSY);
       var id =
           '${labBookingModel.date.toString()}.${labBookingModel.room}.${labBookingModel.slot}';
       var docs = await labBookingCollection.where('id', isEqualTo: id).get();
@@ -171,10 +173,13 @@ class DatabaseService {
         await labBookingCollection
             .doc(labBookingModel.id)
             .set(labBookingModel.toJson());
+        changeNotifier.setState(ViewState.IDLE);
       } else {
-        throw Exception('Slot sudah diambil');
+        changeNotifier.setState(ViewState.IDLE);
+        throw Exception('Slot already booked');
       }
     } catch (e) {
+      changeNotifier.setState(ViewState.IDLE);
       rethrow;
     }
   }
