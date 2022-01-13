@@ -147,10 +147,15 @@ class _HomePageIndexState extends State<HomePageIndex>
                   ///
                   /// Show notification if nearby
                   ///
+                  ///
+
+                  final changeNotifier = context.read<RootChangeNotifier>();
 
                   if (_beaconsViewModels.beacon != null) {
-                    if (_beaconsViewModels.beacon!.accuracy <= 1.0) {
-                      //TODO: Add notifier for notification
+                    if (_beaconsViewModels.beacon!.accuracy <= 1.0 &&
+                        changeNotifier.getPushedNotification[
+                                result.region.identifier] ==
+                            null) {
                       var remoteNotificationLaporJumlah =
                           firebaseMessaging.RemoteNotification(
                               title: 'New beacons detected!',
@@ -158,6 +163,8 @@ class _HomePageIndexState extends State<HomePageIndex>
                       NotificationService().showNotification(
                         remoteNotificationLaporJumlah,
                       );
+                      changeNotifier.setPushedNotification(
+                          result.region.identifier, true);
                     }
                   }
 
@@ -383,7 +390,6 @@ class _HomePageIndexState extends State<HomePageIndex>
   int currentIndex = 0;
   @override
   Widget build(BuildContext context) {
-    final changeNotifier = context.read<RootChangeNotifier>();
     return Scaffold(
       body: PageView(
         onPageChanged: (index) {

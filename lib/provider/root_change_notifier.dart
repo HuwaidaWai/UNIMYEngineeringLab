@@ -7,14 +7,14 @@ class RootChangeNotifier with ChangeNotifier {
   ViewState _viewState = ViewState.IDLE;
   Role? _role;
   File? _imageFood;
-  bool _isPushedNotification = false;
+  Map<String, bool> _isPushedNotification = {};
   void setRole(Role role) {
     _role = role;
     notifyListeners();
   }
 
-  void setPushedNotification(bool isPushed) {
-    _isPushedNotification = isPushed;
+  void setPushedNotification(String identifier, bool pushed) {
+    _isPushedNotification[identifier] = pushed;
     notifyListeners();
   }
 
@@ -29,7 +29,7 @@ class RootChangeNotifier with ChangeNotifier {
   }
 
   File? get getBeacons => _imageFood;
-  bool get getPushedNotification => _isPushedNotification;
+  Map<String, bool> get getPushedNotification => _isPushedNotification;
   Role get getRoleState => _role!;
   ViewState get getViewState => _viewState;
 }

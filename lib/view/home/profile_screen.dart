@@ -28,7 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             LoginButtonWidget(
                 onPressed: () {
                   context.read<AuthService>().signOut(changeNotifier);
-                  changeNotifier.setPushedNotification(false);
+                  // changeNotifier.setPushedNotification(false);
                   Navigator.pushAndRemoveUntil(context,
                       MaterialPageRoute(builder: (context) {
                     return const AuthWrapper();
