@@ -251,7 +251,10 @@ class _AddLabModuleState extends State<AddLabModule> {
             child: TextFormField(
               controller: controller,
               maxLines: isDescription ? null : 1,
-              decoration: InputDecoration(label: Text(label)),
+              decoration: InputDecoration(
+                  label: Text(label),
+                  border: const OutlineInputBorder(
+                      borderSide: BorderSide(width: 1.0))),
             ),
           ),
         ],

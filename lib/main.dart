@@ -270,10 +270,12 @@ class AuthWrapper extends StatelessWidget {
 
 //     await initStorage();
 
-//     // _streamMonitor =
-//     //     flutterBeacon.monitoring(regions).listen((MonitoringResult event) {
-//     //   print('Monitoring Result ${event.monitoringState.toString()}');
-//     // });
+    // _streamMonitor =
+    
+    //     flutterBeacon.monitoring(regions).listen((MonitoringResult event) {
+    //       event.monitoringState
+    //   print('Monitoring Result ${event.monitoringState.toString()}');
+    // });
 //   }
 
 //   pauseScanBeacon() async {
