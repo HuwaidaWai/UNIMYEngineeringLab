@@ -7,6 +7,7 @@ class RootChangeNotifier with ChangeNotifier {
   ViewState _viewState = ViewState.IDLE;
   Role? _role;
   File? _imageFood;
+  // ignore: prefer_final_fields
   Map<String, bool> _isPushedNotification = {};
   void setRole(Role role) {
     _role = role;

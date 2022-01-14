@@ -15,7 +15,6 @@ class LabModuleScreenNew extends StatefulWidget {
 class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
   @override
   Widget build(BuildContext context) {
-    //TODO: Fix lab module screens
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -36,6 +35,10 @@ class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
         child: Column(
           children: [
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Image.asset('assets/unimyLogo.png'),
+            ),
             Text(
               widget.labModuleModel.nameModule!.text,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -64,8 +67,8 @@ class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
                                     fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                             ),
-                            e.titleSection!.text == 'Discussion' ||
-                                    e.titleSection!.text == 'Conclusion'
+                            e.titleSection!.text.contains('Discussion') ||
+                                    e.titleSection!.text.contains('Conclusion')
                                 ? Container(
                                     margin: const EdgeInsets.only(left: 8),
                                     child: TextFormField(

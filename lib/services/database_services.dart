@@ -105,22 +105,29 @@ class DatabaseService {
     }).whenComplete(() => rootChangeNotifier.setState(ViewState.IDLE));
   }
 
-  Future createLabModule(LabModuleViewModel labModuleViewModel) async {
-    for (var section in labModuleViewModel.sections!) {
-      for (var description in section.description!) {
-        if (description.path != null) {
-          final task = await StorageService.uploadFile(
-              destination:
-                  'labModuleImage/${labModuleViewModel.beaconId}/${basename(description.path!)}',
-              file: File(description.path!));
-          description.path = await task.ref.getDownloadURL();
+  Future createLabModule(LabModuleViewModel labModuleViewModel,
+      RootChangeNotifier changeNotifier) async {
+    try {
+      changeNotifier.setState(ViewState.BUSY);
+      for (var section in labModuleViewModel.sections!) {
+        for (var description in section.description!) {
+          if (description.path != null) {
+            final task = await StorageService.uploadFile(
+                destination:
+                    'labModuleImage/${labModuleViewModel.beaconId}/${basename(description.path!)}',
+                file: File(description.path!));
+            description.path = await task.ref.getDownloadURL();
+          }
         }
       }
+      await labModuleCollection
+          .doc(
+              '${labModuleViewModel.nameModule!.text}.${DateTime.now().toIso8601String()}')
+          .set(labModuleViewModel.toJson());
+      changeNotifier.setState(ViewState.IDLE);
+    } catch (e) {
+      changeNotifier.setState(ViewState.IDLE);
     }
-    await labModuleCollection
-        .doc(
-            '${labModuleViewModel.nameModule!.text}.${DateTime.now().toIso8601String()}')
-        .set(labModuleViewModel.toJson());
   }
 
   Future deleteLabModule(String labModuleId) async {

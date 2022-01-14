@@ -411,6 +411,11 @@ class _BeaconScreenState extends State<BeaconScreen>
                                                                 .pictureLink!,
                                                             height: 80,
                                                             width: 80,
+                                                            errorBuilder: (context,
+                                                                    error,
+                                                                    stackTrace) =>
+                                                                Image.asset(
+                                                                    'assets/unimyLogo.png'),
                                                           ),
                                                           Text(
                                                             'Name : ${beacon.value[i].name!}',

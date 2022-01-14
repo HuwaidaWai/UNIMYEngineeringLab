@@ -111,19 +111,41 @@ class _SingleBeaconScreenState extends State<SingleBeaconScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              data[i].nameModule!.text,
-                                              style: subtitleStyle,
-                                            ),
-                                            Text(
-                                              data[i].titleModule!.text,
-                                              style: subtitleStyle2,
-                                            ),
-                                          ],
+                                        Expanded(
+                                          child: Row(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 8.0),
+                                                child: Image.asset(
+                                                  'assets/unimyLab.png',
+                                                  width: 100,
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          data[i]
+                                                              .nameModule!
+                                                              .text,
+                                                          style: subtitleStyle,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Text(
+                                                      data[i].titleModule!.text,
+                                                      style: subtitleStyle2,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                         IconButton(
                                             onPressed: () {

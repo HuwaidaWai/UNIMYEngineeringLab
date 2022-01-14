@@ -4,8 +4,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart' as p;
+import 'package:provider/src/provider.dart';
 import 'package:smart_engineering_lab/constant/color_constant.dart';
+import 'package:smart_engineering_lab/enum/view_state_enum.dart';
 import 'package:smart_engineering_lab/model/lab_module_model.dart';
+import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
 import 'package:smart_engineering_lab/services/database_services.dart';
 
 class AddLabModule extends StatefulWidget {
@@ -23,16 +26,29 @@ class _AddLabModuleState extends State<AddLabModule> {
       titleModule: TextEditingController(),
       sections: [
         SectionViewModel(
-            titleSection: TextEditingController(), description: []),
+            titleSection: TextEditingController(text: '1.0 Introduction'),
+            description: []),
         SectionViewModel(
-            titleSection: TextEditingController(), description: []),
+            titleSection: TextEditingController(text: '2.0 Objective'),
+            description: []),
         SectionViewModel(
-            titleSection: TextEditingController(), description: []),
+            titleSection: TextEditingController(text: '3.0 Flow chart'),
+            description: []),
         SectionViewModel(
-            titleSection: TextEditingController(), description: []),
+            titleSection: TextEditingController(text: '4.0 Tools'),
+            description: []),
         SectionViewModel(
-            titleSection: TextEditingController(), description: []),
-        SectionViewModel(titleSection: TextEditingController(), description: [])
+            titleSection: TextEditingController(text: '5.0 Procedure'),
+            description: []),
+        SectionViewModel(
+            titleSection: TextEditingController(text: '6.0 Introduction'),
+            description: []),
+        SectionViewModel(
+            titleSection: TextEditingController(text: '7.0 Discussion'),
+            description: []),
+        SectionViewModel(
+            titleSection: TextEditingController(text: '8.0 Conclusion'),
+            description: []),
       ]);
   @override
   void initState() {
@@ -41,6 +57,7 @@ class _AddLabModuleState extends State<AddLabModule> {
 
   @override
   Widget build(BuildContext context) {
+    final changeNotifier = context.watch<RootChangeNotifier>();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -74,7 +91,10 @@ class _AddLabModuleState extends State<AddLabModule> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Section'),
+                Text(
+                  'Section',
+                  style: subtitleStyle2,
+                ),
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
@@ -96,6 +116,41 @@ class _AddLabModuleState extends State<AddLabModule> {
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Column(
                         children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      listOfController.sections!
+                                          .removeAt(index);
+                                    });
+                                  },
+                                  child: const Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ))
+                              // Container(
+                              //   padding: const EdgeInsets.all(4),
+                              //   decoration: const BoxDecoration(
+                              //       color: Colors.red,
+                              //       // border: Border.all(color: Colors.white),
+                              //       borderRadius:
+                              //           BorderRadius.all(Radius.circular(16))),
+                              //   child: GestureDetector(
+                              //       onTap: () {
+                              //         setState(() {
+                              //           listOfController.sections!
+                              //               .removeAt(index);
+                              //         });
+                              //       },
+                              //       child: const Icon(
+                              //         Icons.delete,
+                              //         color: Colors.white,
+                              //       )),
+                              // ),
+                            ],
+                          ),
                           TextFormField(
                             decoration: InputDecoration(
                                 label: Text(
@@ -202,12 +257,26 @@ class _AddLabModuleState extends State<AddLabModule> {
                                               .description![indexDescription]
                                               .path = null;
                                         });
+                                      },
+                                      onPressDeleteContainer: () {
+                                        setState(() {
+                                          listOfController
+                                              .sections![index].description!
+                                              .removeWhere(
+                                                  (element) => element == e);
+                                        });
                                       }),
                                 );
                               } else {
                                 return buildTextField(
                                     'Text Description', e.description!, true,
-                                    onTap: () {});
+                                    onTap: () {
+                                  setState(() {
+                                    listOfController
+                                        .sections![index].description!
+                                        .removeWhere((element) => element == e);
+                                  });
+                                });
                               }
                             }).toList(),
                           )
@@ -217,12 +286,18 @@ class _AddLabModuleState extends State<AddLabModule> {
             ElevatedButton(
                 onPressed: () {
                   listOfController.beaconId = widget.beaconId;
-                  DatabaseService().createLabModule(listOfController);
+                  DatabaseService()
+                      .createLabModule(listOfController, changeNotifier)
+                      .whenComplete(() => Navigator.of(context).pop());
                 },
-                child: Text(
-                  'Submit',
-                  style: subtitleStyle2,
-                ))
+                child: changeNotifier.getViewState == ViewState.BUSY
+                    ? const CircularProgressIndicator(
+                        color: Colors.white,
+                      )
+                    : Text(
+                        'Submit',
+                        style: subtitleStyle2,
+                      ))
           ],
         ),
       )),
@@ -249,9 +324,23 @@ class _AddLabModuleState extends State<AddLabModule> {
   //     );
 
   Widget buildImageContainer(
-          Function() onPressed, String? path, Function() onPressedDelete) =>
-      Stack(
+          Function() onPressed, String? path, Function() onPressedDelete,
+          {Function()? onPressDeleteContainer}) =>
+      Column(
         children: [
+          onPressDeleteContainer == null
+              ? Container()
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                        onPressed: onPressDeleteContainer,
+                        child: const Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ))
+                  ],
+                ),
           Container(
             decoration: BoxDecoration(
                 border: Border.all(width: 1.0, color: Colors.grey)),
@@ -284,14 +373,21 @@ class _AddLabModuleState extends State<AddLabModule> {
   Widget buildTextField(
           String label, TextEditingController controller, bool isDescription,
           {Function()? onTap}) =>
-      Stack(
+      Column(
         children: [
           onTap == null
               ? Container()
-              : Positioned(
-                  right: 10,
-                  child: GestureDetector(
-                      onTap: onTap, child: const Icon(Icons.delete))),
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                        onPressed: onTap,
+                        child: const Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ))
+                  ],
+                ),
           Padding(
             padding: EdgeInsets.only(
                 top: 8, bottom: 8, left: isDescription ? 32 : 0),
