@@ -1,12 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/src/provider.dart';
 import 'package:smart_engineering_lab/constant/color_constant.dart';
 import 'package:smart_engineering_lab/main.dart';
+import 'package:smart_engineering_lab/model/user_model.dart';
 import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
 import 'package:smart_engineering_lab/services/auth_service.dart';
 import 'package:smart_engineering_lab/services/database_services.dart';
+import 'package:smart_engineering_lab/view/home/edit_profile_screen.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({Key? key}) : super(key: key);
@@ -20,6 +23,7 @@ class _SettingScreenState extends State<SettingScreen> {
   bool _switchValueApp = false;
   @override
   Widget build(BuildContext context) {
+    final firebaseUser = context.watch<User>();
     final changeNotifier = context.watch<RootChangeNotifier>();
     return Scaffold(
       body: SingleChildScrollView(
@@ -57,19 +61,36 @@ class _SettingScreenState extends State<SettingScreen> {
                           const SizedBox(
                             height: 16,
                           ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Edit Profile',
-                                  style: TextStyle(color: Colors.grey[600]),
-                                ),
-                                const FaIcon(FontAwesomeIcons.chevronRight)
-                              ],
-                            ),
-                          ),
+                          StreamBuilder<UserModel>(
+                              stream: DatabaseService(uid: firebaseUser.uid)
+                                  .readUserName,
+                              builder: (context, snapshot) {
+                                return TextButton(
+                                  onPressed: () {
+                                    if (snapshot.hasData) {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EditProfileScreen(
+                                                    name: snapshot.data!.name!,
+                                                  )));
+                                    }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Edit Profile',
+                                        style:
+                                            TextStyle(color: Colors.grey[600]),
+                                      ),
+                                      const FaIcon(
+                                          FontAwesomeIcons.chevronRight)
+                                    ],
+                                  ),
+                                );
+                              }),
                           TextButton(
                             onPressed: () {},
                             child: Row(

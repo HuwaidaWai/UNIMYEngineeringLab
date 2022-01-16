@@ -9,8 +9,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_engineering_lab/constant/color_constant.dart';
+import 'package:smart_engineering_lab/landing_screen.dart';
 import 'package:smart_engineering_lab/services/database_services.dart';
 import 'package:smart_engineering_lab/services/local_notification_services.dart';
 import 'package:smart_engineering_lab/view/home/home_page_index.dart';
@@ -57,6 +59,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'UNIMY ENGINEERING LAB',
         theme: ThemeData(
+          fontFamily: GoogleFonts.montserrat().fontFamily,
           brightness: Brightness.light,
           primarySwatch: colorCustom,
           appBarTheme: themeData.appBarTheme.copyWith(
@@ -96,7 +99,7 @@ class AuthWrapper extends StatelessWidget {
       DatabaseService(uid: firebaseUser.uid).readUserName;
       return const HomePageIndex();
     }
-    return const LoginScreen();
+    return const LandingScreen();
   }
 }
 

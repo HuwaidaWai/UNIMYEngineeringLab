@@ -20,7 +20,6 @@ class AddLabModule extends StatefulWidget {
 }
 
 class _AddLabModuleState extends State<AddLabModule> {
-  //TODO: Fix delete button
   var listOfController = LabModuleViewModel(
       nameModule: TextEditingController(),
       titleModule: TextEditingController(),

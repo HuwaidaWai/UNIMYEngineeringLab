@@ -25,8 +25,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
-
-    //TODO: Finish UI for homescreen
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 36.0),
       child: Column(

@@ -14,7 +14,8 @@ Map<int, Color> color = {
   900: const Color.fromRGBO(136, 14, 79, 1),
 };
 MaterialColor colorCustom = MaterialColor(0xffd10e48, color);
-
+TextStyle supertitleStyle =
+    GoogleFonts.montserrat(fontSize: 48, fontWeight: FontWeight.w700);
 TextStyle titleStyle =
     GoogleFonts.montserrat(fontSize: 24, fontWeight: FontWeight.bold);
 
@@ -26,6 +27,7 @@ TextStyle subtitleStyle2 =
 
 TextStyle subtitleStyle2Small =
     GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.normal);
-
+TextStyle landingsubtitleStyle =
+    GoogleFonts.montserrat(fontSize: 24, fontWeight: FontWeight.w300);
 TextStyle subtitleStyle3 =
     GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.w300);

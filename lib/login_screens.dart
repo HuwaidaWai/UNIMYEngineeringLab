@@ -10,6 +10,7 @@ import 'package:smart_engineering_lab/services/local_notification_services.dart'
 import 'dart:async';
 
 import 'package:smart_engineering_lab/sign_up_screen.dart';
+import 'package:smart_engineering_lab/view/home/home_page_index.dart';
 import 'package:smart_engineering_lab/widget/login_button_widget.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -146,15 +147,16 @@ class _LoginScreenState extends State<LoginScreen> {
       padding: const EdgeInsets.symmetric(vertical: 25),
       width: double.infinity,
       child: LoginButtonWidget(
-        onPressed: () {
+        onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            context
+            await context
                 .read<AuthService>()
                 .signIn(
                     email: emailController.text,
                     password: pwController.text,
                     changeNotifier: changeNotifier)
                 .catchError((e) {
+              print(' CATCH ERROR : $e');
               showDialog(
                   context: context,
                   builder: (context) {
@@ -167,11 +169,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: const Text('Okay'))
                       ],
                     );
-                  }).whenComplete(() => Navigator.push(context,
-                      MaterialPageRoute(builder: (context) {
-                    return const AuthWrapper();
-                  })));
+                  });
             });
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+              return const HomePageIndex();
+            }));
           }
         },
         child: changeNotifier.getViewState == ViewState.BUSY
