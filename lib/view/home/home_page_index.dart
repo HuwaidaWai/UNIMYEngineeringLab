@@ -17,7 +17,7 @@ import 'package:smart_engineering_lab/services/local_notification_services.dart'
 import 'package:smart_engineering_lab/view/home/beacons_screen.dart';
 import 'package:smart_engineering_lab/view/home/home_screen.dart';
 import 'package:smart_engineering_lab/view/home/lab_booking_screen.dart';
-import 'package:smart_engineering_lab/view/home/profile_screen.dart';
+import 'package:smart_engineering_lab/view/home/settings_screen.dart';
 import 'package:smart_engineering_lab/view/old/requirement_state_controller.dart';
 
 class HomePageIndex extends StatefulWidget {
@@ -399,10 +399,10 @@ class _HomePageIndexState extends State<HomePageIndex>
         scrollDirection: Axis.horizontal,
         controller: pageController,
         children: [
-          const HomeScreen(),
+          HomeScreen(),
           BeaconScreen(isLoading: _isLoading, regionBeacons: regionBeacons),
           const LabBookingScreen(),
-          const ProfileScreen()
+          const SettingScreen()
         ],
       ),
       bottomNavigationBar: FloatingNavbar(
@@ -418,7 +418,7 @@ class _HomePageIndexState extends State<HomePageIndex>
           FloatingNavbarItem(icon: Icons.home),
           FloatingNavbarItem(icon: Icons.list),
           FloatingNavbarItem(icon: Icons.calendar_today),
-          FloatingNavbarItem(icon: Icons.account_circle),
+          FloatingNavbarItem(icon: Icons.settings),
         ],
       ),
     );

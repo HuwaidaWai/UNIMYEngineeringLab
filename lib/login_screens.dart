@@ -175,7 +175,9 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         },
         child: changeNotifier.getViewState == ViewState.BUSY
-            ? const CircularProgressIndicator()
+            ? const CircularProgressIndicator(
+                color: Colors.white,
+              )
             : const Text(
                 'LOGIN',
                 style: TextStyle(
