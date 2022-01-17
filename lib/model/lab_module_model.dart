@@ -15,18 +15,20 @@ class LabModuleModel {
 }
 
 class LabModuleViewModel {
-  TextEditingController? nameModule;
-  TextEditingController? titleModule;
+  String? nameModule;
+  String? titleModule;
   List<SectionViewModel>? sections;
   String? beaconId;
   String? labModuleId;
+  String? userPrepared;
 
   LabModuleViewModel(
       {this.nameModule,
       this.titleModule,
       this.sections,
       this.beaconId,
-      this.labModuleId});
+      this.labModuleId,
+      this.userPrepared});
   factory LabModuleViewModel.fromJson(Map data) {
     return LabModuleViewModel(
         nameModule: data['nameModule'],
@@ -36,10 +38,11 @@ class LabModuleViewModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'nameModule': nameModule!.text,
-      'titleModule': titleModule!.text,
+      'nameModule': nameModule!,
+      'titleModule': titleModule!,
       'sections': sections!.map((e) => e.toJson()).toList(),
-      'beaconId': beaconId
+      'beaconId': beaconId,
+      'userPrepared': userPrepared
     };
   }
 }
@@ -62,7 +65,7 @@ class Section {
 }
 
 class SectionViewModel {
-  TextEditingController? titleSection;
+  String? titleSection;
   List<Description>? description;
   // List<Diagram>? diagramPath;
 
@@ -80,7 +83,7 @@ class SectionViewModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'titleSection': titleSection!.text,
+      'titleSection': titleSection!,
       'description': description!.map((e) => e.toJson()).toList()
     };
   }
@@ -95,12 +98,12 @@ class Diagram {
 
 class Description {
   String? type;
-  TextEditingController? description;
+  String? description;
   String? path;
 
   Description({this.description, this.path, this.type});
 
   Map<String, dynamic> toJson() {
-    return {'type': type, 'description': description!.text, 'path': path};
+    return {'type': type, 'description': description!, 'path': path};
   }
 }

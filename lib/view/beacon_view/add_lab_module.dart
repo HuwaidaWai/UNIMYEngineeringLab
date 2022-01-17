@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart' as p;
@@ -20,35 +21,17 @@ class AddLabModule extends StatefulWidget {
 }
 
 class _AddLabModuleState extends State<AddLabModule> {
-  var listOfController = LabModuleViewModel(
-      nameModule: TextEditingController(),
-      titleModule: TextEditingController(),
-      sections: [
-        SectionViewModel(
-            titleSection: TextEditingController(text: '1.0 Introduction'),
-            description: []),
-        SectionViewModel(
-            titleSection: TextEditingController(text: '2.0 Objective'),
-            description: []),
-        SectionViewModel(
-            titleSection: TextEditingController(text: '3.0 Flow chart'),
-            description: []),
-        SectionViewModel(
-            titleSection: TextEditingController(text: '4.0 Tools'),
-            description: []),
-        SectionViewModel(
-            titleSection: TextEditingController(text: '5.0 Procedure'),
-            description: []),
-        SectionViewModel(
-            titleSection: TextEditingController(text: '6.0 Introduction'),
-            description: []),
-        SectionViewModel(
-            titleSection: TextEditingController(text: '7.0 Discussion'),
-            description: []),
-        SectionViewModel(
-            titleSection: TextEditingController(text: '8.0 Conclusion'),
-            description: []),
-      ]);
+  var labModuleView =
+      LabModuleViewModel(nameModule: '', titleModule: '', sections: [
+    SectionViewModel(titleSection: '1.0 Introduction', description: []),
+    SectionViewModel(titleSection: '2.0 Objective', description: []),
+    SectionViewModel(titleSection: '3.0 Flow chart', description: []),
+    SectionViewModel(titleSection: '4.0 Tools', description: []),
+    SectionViewModel(titleSection: '5.0 Procedure', description: []),
+    SectionViewModel(titleSection: '6.0 Introduction', description: []),
+    SectionViewModel(titleSection: '7.0 Discussion', description: []),
+    SectionViewModel(titleSection: '8.0 Conclusion', description: []),
+  ]);
   @override
   void initState() {
     super.initState();
@@ -57,6 +40,7 @@ class _AddLabModuleState extends State<AddLabModule> {
   @override
   Widget build(BuildContext context) {
     final changeNotifier = context.watch<RootChangeNotifier>();
+    final firebaseUser = context.watch<User>();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -79,12 +63,12 @@ class _AddLabModuleState extends State<AddLabModule> {
           children: [
             buildTextField(
               'Name Module',
-              listOfController.nameModule!,
+              TextEditingController(text: labModuleView.nameModule!),
               false,
             ),
             buildTextField(
               'Title Module',
-              listOfController.titleModule!,
+              TextEditingController(text: labModuleView.titleModule!),
               false,
             ),
             Row(
@@ -97,9 +81,8 @@ class _AddLabModuleState extends State<AddLabModule> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      listOfController.sections!.add(SectionViewModel(
-                          titleSection: TextEditingController(),
-                          description: []));
+                      labModuleView.sections!.add(
+                          SectionViewModel(titleSection: '', description: []));
                     });
                   },
                   child: const Icon(Icons.add),
@@ -110,7 +93,7 @@ class _AddLabModuleState extends State<AddLabModule> {
             ListView.builder(
                 physics: const ClampingScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: listOfController.sections!.length,
+                itemCount: labModuleView.sections!.length,
                 itemBuilder: (context, index) => Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Column(
@@ -121,8 +104,7 @@ class _AddLabModuleState extends State<AddLabModule> {
                               ElevatedButton(
                                   onPressed: () {
                                     setState(() {
-                                      listOfController.sections!
-                                          .removeAt(index);
+                                      labModuleView.sections!.removeAt(index);
                                     });
                                   },
                                   child: const Icon(
@@ -139,7 +121,7 @@ class _AddLabModuleState extends State<AddLabModule> {
                               //   child: GestureDetector(
                               //       onTap: () {
                               //         setState(() {
-                              //           listOfController.sections!
+                              //           labModuleView.sections!
                               //               .removeAt(index);
                               //         });
                               //       },
@@ -158,8 +140,9 @@ class _AddLabModuleState extends State<AddLabModule> {
                                 ),
                                 border: const OutlineInputBorder(
                                     borderSide: BorderSide(width: 1.0))),
-                            controller:
-                                listOfController.sections![index].titleSection,
+                            controller: TextEditingController(
+                                text: labModuleView
+                                    .sections![index].titleSection),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -167,12 +150,10 @@ class _AddLabModuleState extends State<AddLabModule> {
                               ElevatedButton(
                                   onPressed: () {
                                     setState(() {
-                                      listOfController
+                                      labModuleView
                                           .sections![index].description!
                                           .add(Description(
-                                              type: 'TEXT',
-                                              description:
-                                                  TextEditingController()));
+                                              type: 'TEXT', description: ''));
                                     });
                                   },
                                   child: Row(
@@ -190,7 +171,7 @@ class _AddLabModuleState extends State<AddLabModule> {
                               ElevatedButton(
                                   onPressed: () {
                                     setState(() {
-                                      listOfController
+                                      labModuleView
                                           .sections![index].description!
                                           .add(Description(type: 'PICTURE'));
                                     });
@@ -207,7 +188,7 @@ class _AddLabModuleState extends State<AddLabModule> {
                             ],
                           ),
                           Column(
-                            children: listOfController
+                            children: labModuleView
                                 .sections![index].description!
                                 .map((e) {
                               if (e.type == 'PICTURE') {
@@ -227,12 +208,11 @@ class _AddLabModuleState extends State<AddLabModule> {
                                           PlatformFile platformFile =
                                               result.files.first;
                                           path = platformFile.path;
-                                          var indexDescription =
-                                              listOfController
-                                                  .sections![index].description!
-                                                  .indexOf(e);
+                                          var indexDescription = labModuleView
+                                              .sections![index].description!
+                                              .indexOf(e);
                                           setState(() {
-                                            listOfController
+                                            labModuleView
                                                 .sections![index]
                                                 .description![indexDescription]
                                                 .path = path;
@@ -247,11 +227,11 @@ class _AddLabModuleState extends State<AddLabModule> {
                                       e.path,
                                       () {
                                         print('HELLOOO');
-                                        var indexDescription = listOfController
+                                        var indexDescription = labModuleView
                                             .sections![index].description!
                                             .indexOf(e);
                                         setState(() {
-                                          listOfController
+                                          labModuleView
                                               .sections![index]
                                               .description![indexDescription]
                                               .path = null;
@@ -259,7 +239,7 @@ class _AddLabModuleState extends State<AddLabModule> {
                                       },
                                       onPressDeleteContainer: () {
                                         setState(() {
-                                          listOfController
+                                          labModuleView
                                               .sections![index].description!
                                               .removeWhere(
                                                   (element) => element == e);
@@ -268,11 +248,11 @@ class _AddLabModuleState extends State<AddLabModule> {
                                 );
                               } else {
                                 return buildTextField(
-                                    'Text Description', e.description!, true,
-                                    onTap: () {
+                                    'Text Description',
+                                    TextEditingController(text: e.description!),
+                                    true, onTap: () {
                                   setState(() {
-                                    listOfController
-                                        .sections![index].description!
+                                    labModuleView.sections![index].description!
                                         .removeWhere((element) => element == e);
                                   });
                                 });
@@ -284,9 +264,11 @@ class _AddLabModuleState extends State<AddLabModule> {
                     )),
             ElevatedButton(
                 onPressed: () {
-                  listOfController.beaconId = widget.beaconId;
+                  labModuleView.beaconId = widget.beaconId;
+                  labModuleView.userPrepared =
+                      changeNotifier.getUserModel.name!;
                   DatabaseService()
-                      .createLabModule(listOfController, changeNotifier)
+                      .createLabModule(labModuleView, changeNotifier)
                       .whenComplete(() => Navigator.of(context).pop());
                 },
                 child: changeNotifier.getViewState == ViewState.BUSY

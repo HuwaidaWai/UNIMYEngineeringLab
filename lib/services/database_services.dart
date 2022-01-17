@@ -122,7 +122,7 @@ class DatabaseService {
       }
       await labModuleCollection
           .doc(
-              '${labModuleViewModel.nameModule!.text}.${DateTime.now().toIso8601String()}')
+              '${labModuleViewModel.nameModule!}.${DateTime.now().toIso8601String()}')
           .set(labModuleViewModel.toJson());
       changeNotifier.setState(ViewState.IDLE);
     } catch (e) {
@@ -147,19 +147,18 @@ class DatabaseService {
       var section = e1['sections'] as List;
       return LabModuleViewModel(
           labModuleId: e1.id,
-          nameModule: TextEditingController(text: e1['nameModule']),
-          titleModule: TextEditingController(text: e1['titleModule']),
+          nameModule: e1['nameModule'],
+          titleModule: e1['titleModule'],
           sections: section.map<SectionViewModel>((e2) {
             var descriptionSection = e2['description'] as List;
             // print('Identifier please : ${e2['description']}');
             return SectionViewModel(
-                titleSection: TextEditingController(text: e2['titleSection']),
+                titleSection: e2['titleSection'],
                 description: descriptionSection.map<Description>((e3) {
                   return Description(
                       path: e3['path'],
                       type: e3['type'],
-                      description:
-                          TextEditingController(text: e3['description']));
+                      description: e3['description']);
                 }).toList());
           }).toList());
     }).toList();

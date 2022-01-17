@@ -130,15 +130,13 @@ class _SingleBeaconScreenState extends State<SingleBeaconScreen> {
                                                     Row(
                                                       children: [
                                                         Text(
-                                                          data[i]
-                                                              .nameModule!
-                                                              .text,
+                                                          data[i].nameModule!,
                                                           style: subtitleStyle,
                                                         ),
                                                       ],
                                                     ),
                                                     Text(
-                                                      data[i].titleModule!.text,
+                                                      data[i].titleModule!,
                                                       style: subtitleStyle2,
                                                     ),
                                                   ],

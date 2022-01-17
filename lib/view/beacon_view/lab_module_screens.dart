@@ -26,7 +26,7 @@ class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
               color: Colors.white,
             )),
         title: Text(
-          widget.labModuleModel.nameModule!.text,
+          widget.labModuleModel.nameModule!,
           style: subtitleStyle,
         ),
       ),
@@ -40,13 +40,13 @@ class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
               child: Image.asset('assets/unimyLogo.png'),
             ),
             Text(
-              widget.labModuleModel.nameModule!.text,
+              widget.labModuleModel.nameModule!,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Container(
               padding: const EdgeInsets.only(bottom: 30),
               child: Text(
-                widget.labModuleModel.titleModule!.text,
+                widget.labModuleModel.titleModule!,
                 style:
                     const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
@@ -62,13 +62,13 @@ class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
                             Container(
                               padding: const EdgeInsets.only(bottom: 8),
                               child: Text(
-                                e.titleSection!.text,
+                                e.titleSection!,
                                 style: const TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                             ),
-                            e.titleSection!.text.contains('Discussion') ||
-                                    e.titleSection!.text.contains('Conclusion')
+                            e.titleSection!.contains('Discussion') ||
+                                    e.titleSection!.contains('Conclusion')
                                 ? Container(
                                     margin: const EdgeInsets.only(left: 8),
                                     child: TextFormField(
@@ -76,7 +76,7 @@ class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
                                             border: const OutlineInputBorder(
                                                 borderSide:
                                                     BorderSide(width: 1)),
-                                            hintText: e.titleSection!.text)))
+                                            hintText: e.titleSection!)))
                                 : Container(
                                     margin: const EdgeInsets.only(left: 8),
                                     child: Column(
@@ -84,7 +84,7 @@ class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
                                         if (e1.type == 'PICTURE') {
                                           return Image.network(e1.path!);
                                         } else {
-                                          return Text(e1.description!.text);
+                                          return Text(e1.description!);
                                         }
                                       }).toList(),
                                     ))
