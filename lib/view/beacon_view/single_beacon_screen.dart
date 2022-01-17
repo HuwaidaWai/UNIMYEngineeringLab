@@ -97,12 +97,12 @@ class _SingleBeaconScreenState extends State<SingleBeaconScreen> {
                             itemBuilder: (context, i) {
                               return GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              LabModuleScreenNew(
-                                                  labModuleModel: data[i])));
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) {
+                                    data[i].beaconId = widget.region.identifier;
+                                    return LabModuleScreenNew(
+                                        labModuleModel: data[i]);
+                                  }));
                                 },
                                 child: Card(
                                   child: Padding(
@@ -130,13 +130,15 @@ class _SingleBeaconScreenState extends State<SingleBeaconScreen> {
                                                     Row(
                                                       children: [
                                                         Text(
-                                                          data[i].nameModule!,
+                                                          data[i]
+                                                              .nameModule!
+                                                              .text,
                                                           style: subtitleStyle,
                                                         ),
                                                       ],
                                                     ),
                                                     Text(
-                                                      data[i].titleModule!,
+                                                      data[i].titleModule!.text,
                                                       style: subtitleStyle2,
                                                     ),
                                                   ],

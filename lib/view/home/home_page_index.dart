@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart'
@@ -151,23 +152,6 @@ class _HomePageIndexState extends State<HomePageIndex>
 
                   final changeNotifier = context.read<RootChangeNotifier>();
 
-                  if (_beaconsViewModels.beacon != null) {
-                    if (_beaconsViewModels.beacon!.accuracy <= 1.0 &&
-                        changeNotifier.getPushedNotification[
-                                result.region.identifier] ==
-                            null) {
-                      var remoteNotificationLaporJumlah =
-                          firebaseMessaging.RemoteNotification(
-                              title: 'New beacons detected!',
-                              body: '${_beaconsViewModels.name} is nearest');
-                      NotificationService().showNotification(
-                        remoteNotificationLaporJumlah,
-                      );
-                      changeNotifier.setPushedNotification(
-                          result.region.identifier, true);
-                    }
-                  }
-
                   beaconsViewModels.addIf(
                       beaconsViewModels.firstWhereOrNull((element) =>
                               _beaconsViewModels.beacon?.major ==
@@ -180,7 +164,29 @@ class _HomePageIndexState extends State<HomePageIndex>
                           null,
                       result.region);
                   // regionBeacons.update(result.region, (value) => null);
+
                   regionBeacons[result.region] = [_beaconsViewModels];
+                  if (_beaconsViewModels.beacon != null) {
+                    if (_beaconsViewModels.beacon!.accuracy <= 1.0 &&
+                        changeNotifier.getPushedNotification[
+                                result.region.identifier] ==
+                            null &&
+                        regionBeacons[result.region] != null) {
+                      print('NOTIFICATION!');
+                      var remoteNotificationLaporJumlah =
+                          firebaseMessaging.RemoteNotification(
+                              title: 'New beacons detected!',
+                              body: '${_beaconsViewModels.name} is nearest');
+                      NotificationService().showNotification(
+                          remoteNotificationLaporJumlah,
+                          jsonEncode({
+                            'beacons': regionBeacons[result.region],
+                            'region': result.region.toJson
+                          }));
+                      changeNotifier.setPushedNotification(
+                          result.region.identifier, true);
+                    }
+                  }
                 }
 
                 regionBeacons.removeWhere((key, value) =>
@@ -391,6 +397,10 @@ class _HomePageIndexState extends State<HomePageIndex>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('UNIMY ENGINEERING LAB'),
+        centerTitle: true,
+      ),
       body: PageView(
         onPageChanged: (index) {
           pageChanged(index);

@@ -57,6 +57,7 @@ class MyApp extends StatelessWidget {
             initialData: null)
       ],
       child: MaterialApp(
+        navigatorKey: navKey,
         title: 'UNIMY ENGINEERING LAB',
         theme: ThemeData(
           fontFamily: GoogleFonts.montserrat().fontFamily,
@@ -93,7 +94,7 @@ class AuthWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final firebaseUser = context.watch<User?>();
-
+    final changeNotifier = context.watch<RootChangeNotifier>();
     print('This is firebase user : $firebaseUser');
     if (firebaseUser != null) {
       DatabaseService(uid: firebaseUser.uid).readUserName;

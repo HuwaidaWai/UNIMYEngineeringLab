@@ -30,6 +30,7 @@ class AuthService {
     required String password,
     required String displayName,
     required String role,
+    required String id,
     required RootChangeNotifier changeNotifier,
   }) async {
     try {
@@ -42,7 +43,7 @@ class AuthService {
       // profilePicUrl = await task.ref.getDownloadURL();
 
       await DatabaseService(uid: userCredential.user!.uid)
-          .createUserData(email: email, name: displayName, role: role);
+          .createUserData(email: email, name: displayName, role: role, id: id);
 
       changeNotifier.setState(ViewState.IDLE);
       return "Signed Up";

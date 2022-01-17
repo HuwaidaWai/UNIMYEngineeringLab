@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_engineering_lab/model/user_model.dart';
 
 class LabModuleModel {
   String? nameModule;
@@ -15,20 +16,23 @@ class LabModuleModel {
 }
 
 class LabModuleViewModel {
-  String? nameModule;
-  String? titleModule;
+  TextEditingController? nameModule;
+  TextEditingController? titleModule;
   List<SectionViewModel>? sections;
   String? beaconId;
   String? labModuleId;
-  String? userPrepared;
-
+  String? userPreparedFor;
+  List<UserModel>? userPreparedBy;
+  bool? submitted;
   LabModuleViewModel(
       {this.nameModule,
       this.titleModule,
       this.sections,
       this.beaconId,
       this.labModuleId,
-      this.userPrepared});
+      this.userPreparedFor,
+      this.userPreparedBy,
+      this.submitted});
   factory LabModuleViewModel.fromJson(Map data) {
     return LabModuleViewModel(
         nameModule: data['nameModule'],
@@ -38,11 +42,13 @@ class LabModuleViewModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'nameModule': nameModule!,
-      'titleModule': titleModule!,
+      'nameModule': nameModule!.text,
+      'titleModule': titleModule!.text,
       'sections': sections!.map((e) => e.toJson()).toList(),
       'beaconId': beaconId,
-      'userPrepared': userPrepared
+      'userPreparedFor': userPreparedFor,
+      'userPreparedBy': userPreparedBy!.map((e) => e.toJson()).toList(),
+      'submitted': submitted
     };
   }
 }
@@ -65,7 +71,7 @@ class Section {
 }
 
 class SectionViewModel {
-  String? titleSection;
+  TextEditingController? titleSection;
   List<Description>? description;
   // List<Diagram>? diagramPath;
 
@@ -83,7 +89,7 @@ class SectionViewModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'titleSection': titleSection!,
+      'titleSection': titleSection!.text,
       'description': description!.map((e) => e.toJson()).toList()
     };
   }
@@ -98,12 +104,18 @@ class Diagram {
 
 class Description {
   String? type;
-  String? description;
+  TextEditingController? description;
   String? path;
+  String? pictureLink;
 
-  Description({this.description, this.path, this.type});
+  Description({this.description, this.path, this.type, this.pictureLink});
 
   Map<String, dynamic> toJson() {
-    return {'type': type, 'description': description!, 'path': path};
+    return {
+      'type': type,
+      'description': description!.text,
+      'path': path,
+      'pictureLink': pictureLink
+    };
   }
 }

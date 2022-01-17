@@ -353,7 +353,7 @@ class _BeaconScreenState extends State<BeaconScreen>
                 : widget.regionBeacons.isEmpty && widget.isLoading == false
                     ? const Center(child: Text('No Beacons'))
                     : GridView.count(
-                        childAspectRatio: 0.6,
+                        childAspectRatio: 1,
                         shrinkWrap: true,
                         physics: const ClampingScrollPhysics(),
                         primary: false,
@@ -402,9 +402,9 @@ class _BeaconScreenState extends State<BeaconScreen>
                                                           const EdgeInsets.all(
                                                               8.0),
                                                       child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                        // crossAxisAlignment:
+                                                        //     CrossAxisAlignment
+                                                        //         .start,
                                                         children: [
                                                           Image.network(
                                                             beacon.value[i]
@@ -416,22 +416,24 @@ class _BeaconScreenState extends State<BeaconScreen>
                                                                     stackTrace) =>
                                                                 Image.asset(
                                                                     'assets/unimyLogo.png'),
+                                                            fit: BoxFit.cover,
                                                           ),
                                                           Text(
-                                                            'Name : ${beacon.value[i].name!}',
+                                                            beacon
+                                                                .value[i].name!,
                                                             style:
                                                                 subtitleStyle2Small,
                                                           ),
-                                                          Text(
-                                                            'Signal: ${RssiSignal.rssiTranslator(beacon.value[i].beacon!.rssi)}',
-                                                            style:
-                                                                subtitleStyle2Small,
-                                                          ),
-                                                          Text(
-                                                            'Distance:  ${beacon.value[i].beacon!.accuracy.toString()} m',
-                                                            style:
-                                                                subtitleStyle2Small,
-                                                          ),
+                                                          // Text(
+                                                          //   'Signal: ${RssiSignal.rssiTranslator(beacon.value[i].beacon!.rssi)}',
+                                                          //   style:
+                                                          //       subtitleStyle2Small,
+                                                          // ),
+                                                          // Text(
+                                                          //   'Distance:  ${beacon.value[i].beacon!.accuracy.toString()} m',
+                                                          //   style:
+                                                          //       subtitleStyle2Small,
+                                                          // ),
                                                         ],
                                                       ),
                                                     );

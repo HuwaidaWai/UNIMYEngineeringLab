@@ -1,5 +1,12 @@
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:smart_engineering_lab/constant/color_constant.dart';
+import 'package:smart_engineering_lab/model/beacons_view_model.dart';
+import 'package:smart_engineering_lab/view/beacon_view/single_beacon_screen.dart';
 
 class NotificationService {
   AndroidNotificationChannel channel = const AndroidNotificationChannel(
@@ -47,8 +54,17 @@ class NotificationService {
 
   //?Handle notification tapped
   static Future selectNotification(String? payload) async {
-    if (payload == 'data') {
-      //log('Hai awak tekan notification, ini datanya :$payload');
+    if (payload != null) {
+      print('PAYLOAD :$payload');
+      var payloadDecoded = jsonDecode(payload);
+      var beacons = payloadDecoded['beacons'] as List;
+      var region = payloadDecoded['region'];
+      var regionViewModel = Region.fromJson(region);
+      var beaconViewModel = BeaconViewModel.fromJson(beacons.first);
+
+      navKey.currentState!.push(MaterialPageRoute(
+          builder: (context) => SingleBeaconScreen(
+              beaconViewModel: beaconViewModel, region: regionViewModel)));
     }
   }
 
@@ -60,8 +76,7 @@ class NotificationService {
   }
 
   Future showNotification(
-    RemoteNotification notification,
-  ) async {
+      RemoteNotification notification, String payloadNamaBeacon) async {
     AndroidNotificationDetails androidPlatformChannelSpecifics =
         const AndroidNotificationDetails(
       '1',
@@ -93,6 +108,6 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin.show(
         notification.hashCode, title, body, platformChannelSpecifics,
-        payload: 'data');
+        payload: payloadNamaBeacon);
   }
 }

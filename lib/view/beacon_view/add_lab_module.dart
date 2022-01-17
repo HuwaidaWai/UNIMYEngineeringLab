@@ -9,6 +9,7 @@ import 'package:provider/src/provider.dart';
 import 'package:smart_engineering_lab/constant/color_constant.dart';
 import 'package:smart_engineering_lab/enum/view_state_enum.dart';
 import 'package:smart_engineering_lab/model/lab_module_model.dart';
+import 'package:smart_engineering_lab/model/user_model.dart';
 import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
 import 'package:smart_engineering_lab/services/database_services.dart';
 
@@ -21,17 +22,35 @@ class AddLabModule extends StatefulWidget {
 }
 
 class _AddLabModuleState extends State<AddLabModule> {
-  var labModuleView =
-      LabModuleViewModel(nameModule: '', titleModule: '', sections: [
-    SectionViewModel(titleSection: '1.0 Introduction', description: []),
-    SectionViewModel(titleSection: '2.0 Objective', description: []),
-    SectionViewModel(titleSection: '3.0 Flow chart', description: []),
-    SectionViewModel(titleSection: '4.0 Tools', description: []),
-    SectionViewModel(titleSection: '5.0 Procedure', description: []),
-    SectionViewModel(titleSection: '6.0 Introduction', description: []),
-    SectionViewModel(titleSection: '7.0 Discussion', description: []),
-    SectionViewModel(titleSection: '8.0 Conclusion', description: []),
-  ]);
+  var labModuleView = LabModuleViewModel(
+      nameModule: TextEditingController(text: ''),
+      titleModule: TextEditingController(text: ''),
+      sections: [
+        SectionViewModel(
+            titleSection: TextEditingController(text: '1.0 Introduction'),
+            description: []),
+        SectionViewModel(
+            titleSection: TextEditingController(text: '2.0 Objective'),
+            description: []),
+        SectionViewModel(
+            titleSection: TextEditingController(text: '3.0 Flow chart'),
+            description: []),
+        SectionViewModel(
+            titleSection: TextEditingController(text: '4.0 Tools'),
+            description: []),
+        SectionViewModel(
+            titleSection: TextEditingController(text: '5.0 Procedure'),
+            description: []),
+        SectionViewModel(
+            titleSection: TextEditingController(text: '6.0 Introduction'),
+            description: []),
+        SectionViewModel(
+            titleSection: TextEditingController(text: '7.0 Discussion'),
+            description: []),
+        SectionViewModel(
+            titleSection: TextEditingController(text: '8.0 Conclusion'),
+            description: []),
+      ]);
   @override
   void initState() {
     super.initState();
@@ -39,8 +58,8 @@ class _AddLabModuleState extends State<AddLabModule> {
 
   @override
   Widget build(BuildContext context) {
-    final changeNotifier = context.watch<RootChangeNotifier>();
     final firebaseUser = context.watch<User>();
+    final changeNotifier = context.watch<RootChangeNotifier>();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -63,12 +82,12 @@ class _AddLabModuleState extends State<AddLabModule> {
           children: [
             buildTextField(
               'Name Module',
-              TextEditingController(text: labModuleView.nameModule!),
+              labModuleView.nameModule!,
               false,
             ),
             buildTextField(
               'Title Module',
-              TextEditingController(text: labModuleView.titleModule!),
+              labModuleView.titleModule!,
               false,
             ),
             Row(
@@ -81,8 +100,9 @@ class _AddLabModuleState extends State<AddLabModule> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      labModuleView.sections!.add(
-                          SectionViewModel(titleSection: '', description: []));
+                      labModuleView.sections!.add(SectionViewModel(
+                          titleSection: TextEditingController(),
+                          description: []));
                     });
                   },
                   child: const Icon(Icons.add),
@@ -140,9 +160,8 @@ class _AddLabModuleState extends State<AddLabModule> {
                                 ),
                                 border: const OutlineInputBorder(
                                     borderSide: BorderSide(width: 1.0))),
-                            controller: TextEditingController(
-                                text: labModuleView
-                                    .sections![index].titleSection),
+                            controller:
+                                labModuleView.sections![index].titleSection,
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -153,7 +172,9 @@ class _AddLabModuleState extends State<AddLabModule> {
                                       labModuleView
                                           .sections![index].description!
                                           .add(Description(
-                                              type: 'TEXT', description: ''));
+                                              type: 'TEXT',
+                                              description:
+                                                  TextEditingController()));
                                     });
                                   },
                                   child: Row(
@@ -248,9 +269,8 @@ class _AddLabModuleState extends State<AddLabModule> {
                                 );
                               } else {
                                 return buildTextField(
-                                    'Text Description',
-                                    TextEditingController(text: e.description!),
-                                    true, onTap: () {
+                                    'Text Description', e.description!, true,
+                                    onTap: () {
                                   setState(() {
                                     labModuleView.sections![index].description!
                                         .removeWhere((element) => element == e);
@@ -262,23 +282,32 @@ class _AddLabModuleState extends State<AddLabModule> {
                         ],
                       ),
                     )),
-            ElevatedButton(
-                onPressed: () {
-                  labModuleView.beaconId = widget.beaconId;
-                  labModuleView.userPrepared =
-                      changeNotifier.getUserModel.name!;
-                  DatabaseService()
-                      .createLabModule(labModuleView, changeNotifier)
-                      .whenComplete(() => Navigator.of(context).pop());
-                },
-                child: changeNotifier.getViewState == ViewState.BUSY
-                    ? const CircularProgressIndicator(
-                        color: Colors.white,
-                      )
-                    : Text(
-                        'Submit',
-                        style: subtitleStyle2,
-                      ))
+            StreamBuilder<UserModel>(
+                stream: DatabaseService(uid: firebaseUser.uid).readUserName,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return ElevatedButton(
+                        onPressed: () {
+                          labModuleView.beaconId = widget.beaconId;
+                          labModuleView.userPreparedFor = snapshot.data!.name;
+                          labModuleView.userPreparedBy = <UserModel>[];
+                          labModuleView.submitted = false;
+                          DatabaseService()
+                              .createLabModule(labModuleView, changeNotifier)
+                              .whenComplete(() => Navigator.of(context).pop());
+                        },
+                        child: changeNotifier.getViewState == ViewState.BUSY
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : Text(
+                                'Submit',
+                                style: subtitleStyle2,
+                              ));
+                  } else {
+                    return Container();
+                  }
+                })
           ],
         ),
       )),
@@ -326,29 +355,33 @@ class _AddLabModuleState extends State<AddLabModule> {
             decoration: BoxDecoration(
                 border: Border.all(width: 1.0, color: Colors.grey)),
             padding: const EdgeInsets.all(8),
-            child: Center(
-              child: path == null
-                  ? OutlinedButton(
-                      child: Text(
-                        'Pick File',
-                        style: subtitleStyle2Small,
-                      ),
-                      onPressed: onPressed)
-                  : Image.file(
-                      File(path),
-                      height: 100,
-                    ),
+            child: Stack(
+              children: [
+                Center(
+                  child: path == null
+                      ? OutlinedButton(
+                          child: Text(
+                            'Pick File',
+                            style: subtitleStyle2Small,
+                          ),
+                          onPressed: onPressed)
+                      : Image.file(
+                          File(path),
+                          height: 100,
+                        ),
+                ),
+                path == null
+                    ? Container()
+                    : Positioned(
+                        top: 5,
+                        right: 10,
+                        child: IconButton(
+                          onPressed: onPressedDelete,
+                          icon: const Icon(Icons.delete),
+                        )),
+              ],
             ),
           ),
-          path == null
-              ? Container()
-              : Positioned(
-                  top: 5,
-                  right: 10,
-                  child: IconButton(
-                    onPressed: onPressedDelete,
-                    icon: const Icon(Icons.delete),
-                  )),
         ],
       );
   Widget buildTextField(

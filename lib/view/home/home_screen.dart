@@ -24,51 +24,46 @@ class HomeScreen extends StatelessWidget {
   ];
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
+    // var height = MediaQuery.of(context).size.height;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 36.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: height * 0.6,
-            child: Swiper(
-              axisDirection: AxisDirection.left,
-              itemCount: swiperModels.length,
+      child: SizedBox(
+        // height: height * 0.6,
+        child: Swiper(
+          axisDirection: AxisDirection.left,
+          itemCount: swiperModels.length,
 
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    Image.asset(swiperModels[index].pathImage),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        swiperModels[index].title,
-                        style: titleStyle,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        swiperModels[index].description,
-                        style: subtitleStyle2Small,
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                  ],
-                );
-              },
+          itemBuilder: (context, index) {
+            return Column(
+              children: [
+                Image.asset(swiperModels[index].pathImage),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    swiperModels[index].title,
+                    style: titleStyle,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    swiperModels[index].description,
+                    style: subtitleStyle2Small,
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              ],
+            );
+          },
 
-              pagination: const SwiperPagination(
-                margin: EdgeInsets.only(bottom: 2.0),
-                builder: DotSwiperPaginationBuilder(
-                    color: Colors.grey, activeColor: Colors.red),
-              ),
-              // control: const SwiperControl(),
-            ),
+          pagination: const SwiperPagination(
+            margin: EdgeInsets.only(bottom: 2.0),
+            builder: DotSwiperPaginationBuilder(
+                color: Colors.grey, activeColor: Colors.red),
           ),
-        ],
+          // control: const SwiperControl(),
+        ),
       ),
     );
   }

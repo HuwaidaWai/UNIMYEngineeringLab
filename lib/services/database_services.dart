@@ -34,14 +34,20 @@ class DatabaseService {
     required String name,
     required String email,
     required String role,
+    required String id,
   }) async {
     await userUELDataCollection.doc(uid).set({
       'name': name,
       'email': email,
+      'id': id,
       'uid': uid,
       'role': role,
       'lastSeen': DateTime.now().toUtc(),
     });
+  }
+
+  Future updateUserData({required Map<String, dynamic> data}) async {
+    await userUELDataCollection.doc(uid).update(data);
   }
 
   Stream<UserModel> get readUserName {
@@ -63,7 +69,8 @@ class DatabaseService {
         uid: data['uid'],
         name: data['name'],
         email: data['email'],
-        role: data['role']);
+        role: data['role'],
+        id: data['id']);
   }
 
   Future createBeacon(BeaconEstimote beaconEstimote,
@@ -110,23 +117,51 @@ class DatabaseService {
     try {
       changeNotifier.setState(ViewState.BUSY);
       for (var section in labModuleViewModel.sections!) {
-        for (var description in section.description!) {
+        await Future.forEach<Description>(section.description!,
+            (description) async {
           if (description.path != null) {
             final task = await StorageService.uploadFile(
                 destination:
                     'labModuleImage/${labModuleViewModel.beaconId}/${basename(description.path!)}',
                 file: File(description.path!));
-            description.path = await task.ref.getDownloadURL();
+            description.pictureLink = await task.ref.getDownloadURL();
           }
-        }
+        });
       }
       await labModuleCollection
           .doc(
-              '${labModuleViewModel.nameModule!}.${DateTime.now().toIso8601String()}')
+              '${labModuleViewModel.nameModule!.text}.${DateTime.now().toIso8601String()}')
           .set(labModuleViewModel.toJson());
       changeNotifier.setState(ViewState.IDLE);
     } catch (e) {
       changeNotifier.setState(ViewState.IDLE);
+      rethrow;
+    }
+  }
+
+  Future updateLabModule(LabModuleViewModel labModuleViewModel,
+      RootChangeNotifier changeNotifier) async {
+    try {
+      changeNotifier.setState(ViewState.BUSY);
+      // for (var section in labModuleViewModel.sections!) {
+      //   await Future.forEach<Description>(section.description!,
+      //       (description) async {
+      //     if (description.path != null) {
+      //       final task = await StorageService.uploadFile(
+      //           destination:
+      //               'labModuleImage/${labModuleViewModel.beaconId}/${basename(description.path!)}',
+      //           file: File(description.path!));
+      //       description.pictureLink = await task.ref.getDownloadURL();
+      //     }
+      //   });
+      // }
+      await labModuleCollection
+          .doc(labModuleViewModel.labModuleId)
+          .update(labModuleViewModel.toJson());
+      changeNotifier.setState(ViewState.IDLE);
+    } catch (e) {
+      changeNotifier.setState(ViewState.IDLE);
+      rethrow;
     }
   }
 
@@ -145,20 +180,27 @@ class DatabaseService {
     return snapshot.docs.map((e1) {
       print('Identifier please : ${e1.id}');
       var section = e1['sections'] as List;
+      var preparedBys = e1['userPreparedBy'] as List;
       return LabModuleViewModel(
+          userPreparedBy: preparedBys
+              .map((user) => UserModel(id: user['id'], name: user['name']))
+              .toList(),
+          userPreparedFor: e1['userPreparedFor'],
           labModuleId: e1.id,
-          nameModule: e1['nameModule'],
-          titleModule: e1['titleModule'],
+          nameModule: TextEditingController(text: e1['nameModule']),
+          titleModule: TextEditingController(text: e1['titleModule']),
           sections: section.map<SectionViewModel>((e2) {
             var descriptionSection = e2['description'] as List;
             // print('Identifier please : ${e2['description']}');
             return SectionViewModel(
-                titleSection: e2['titleSection'],
+                titleSection: TextEditingController(text: e2['titleSection']),
                 description: descriptionSection.map<Description>((e3) {
                   return Description(
                       path: e3['path'],
                       type: e3['type'],
-                      description: e3['description']);
+                      pictureLink: e3['pictureLink'],
+                      description:
+                          TextEditingController(text: e3['description']));
                 }).toList());
           }).toList());
     }).toList();

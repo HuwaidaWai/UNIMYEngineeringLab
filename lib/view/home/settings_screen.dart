@@ -73,6 +73,10 @@ class _SettingScreenState extends State<SettingScreen> {
                                               builder: (context) =>
                                                   EditProfileScreen(
                                                     name: snapshot.data!.name!,
+                                                    role: snapshot.data!.role!,
+                                                    id: snapshot.data!.id!,
+                                                    email:
+                                                        snapshot.data!.email!,
                                                   )));
                                     }
                                   },

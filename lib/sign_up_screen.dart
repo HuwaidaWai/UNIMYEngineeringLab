@@ -86,6 +86,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 email: emailController.text,
                                 password: pwController.text,
                                 displayName: nameController.text,
+                                id: idController.text,
                                 role: studentSelected ? 'STUDENT' : 'LECTURER',
                                 changeNotifier: changeNotifier)
                             .catchError((e) {

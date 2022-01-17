@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+final navKey = GlobalKey<NavigatorState>();
 Map<int, Color> color = {
   50: const Color.fromRGBO(136, 14, 79, .1),
   100: const Color.fromRGBO(136, 14, 79, .2),
