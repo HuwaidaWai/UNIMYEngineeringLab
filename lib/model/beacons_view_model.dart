@@ -4,8 +4,8 @@ class BeaconViewModel {
   String? name;
   String? pictureLink;
   Beacon? beacon;
-
-  BeaconViewModel({this.beacon, this.name, this.pictureLink});
+  bool? attendance;
+  BeaconViewModel({this.beacon, this.name, this.pictureLink, this.attendance});
 
   factory BeaconViewModel.fromJson(Map<String, dynamic> data) {
     return BeaconViewModel(
@@ -15,10 +15,16 @@ class BeaconViewModel {
             minor: data['beacon']['minor'],
             accuracy: data['beacon']['accuracy']),
         name: data['name'],
-        pictureLink: data['pictureLink']);
+        pictureLink: data['pictureLink'],
+        attendance: data['attendance']);
   }
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'pictureLink': pictureLink, 'beacon': beacon!.toJson};
+    return {
+      'name': name,
+      'pictureLink': pictureLink,
+      'beacon': beacon!.toJson,
+      'attendance': attendance
+    };
   }
 }

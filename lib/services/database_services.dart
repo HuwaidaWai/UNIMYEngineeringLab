@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:smart_engineering_lab/enum/view_state_enum.dart';
+import 'package:smart_engineering_lab/model/attendance_model.dart';
 import 'package:smart_engineering_lab/model/beacons_model.dart';
 import 'package:smart_engineering_lab/model/lab_booking_model.dart';
 import 'package:smart_engineering_lab/model/lab_module_model.dart';
@@ -28,6 +29,9 @@ class DatabaseService {
 
   final CollectionReference labBookingCollection =
       FirebaseFirestore.instance.collection('labBooking');
+
+  final CollectionReference attendanceCollection =
+      FirebaseFirestore.instance.collection('attendaces');
 
 //USER DATA
   Future createUserData({
@@ -206,6 +210,41 @@ class DatabaseService {
     }).toList();
   }
 
+  Future createAttendance(AttendanceModel attendanceModel) async {
+    try {
+      var docs = await attendanceCollection
+          .where('id', isEqualTo: attendanceModel.id)
+          .get();
+      if (docs.docs.isEmpty) {
+        await attendanceCollection
+            .doc(attendanceModel.id)
+            .set(attendanceModel.toJson());
+      }
+    } catch (e) {
+      print('error create attendance : ${e.toString()}');
+    }
+  }
+
+  Future updateAttendance(AttendanceModel attendanceModel) async {
+    try {
+      await attendanceCollection
+          .doc(attendanceModel.id)
+          .update(attendanceModel.toJson());
+    } catch (e) {
+      print('error update attendance : ${e.toString()}');
+    }
+  }
+
+  Stream<List<AttendanceModel>> get listOfAttendace {
+    return attendanceCollection.snapshots().map((event) => event.docs
+        .map((e) => AttendanceModel(
+            date: e['date'],
+            time: e['time'],
+            user: UserModel.fromJson(e['user']),
+            id: e['id']))
+        .toList());
+  }
+
   Future createLabBooking(LabBookingModel labBookingModel,
       RootChangeNotifier changeNotifier) async {
     try {
@@ -257,7 +296,8 @@ class DatabaseService {
             uuid: e['uuid'],
             major: e['major'],
             minor: e['minor'],
-            pictureLink: e['pictureLink']))
+            pictureLink: e['pictureLink'],
+            attendance: e['attendance']))
         .toList();
   }
 }

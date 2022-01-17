@@ -5,6 +5,7 @@ class BeaconEstimote {
   int? major;
   int? minor;
   String? pictureLink;
+  bool? attendance;
 
   BeaconEstimote(
       {this.uuid,
@@ -12,7 +13,8 @@ class BeaconEstimote {
       this.minor,
       this.name,
       this.identifier,
-      this.pictureLink});
+      this.pictureLink,
+      this.attendance});
 
   factory BeaconEstimote.fromJson(Map json) {
     return BeaconEstimote(
@@ -21,7 +23,8 @@ class BeaconEstimote {
         name: json['name'],
         major: json['major'],
         minor: json['minor'],
-        pictureLink: json['pictureLink']);
+        pictureLink: json['pictureLink'],
+        attendance: json['attendance']);
   }
 
   Map toJson() {
@@ -31,7 +34,8 @@ class BeaconEstimote {
       'major': major,
       'minor': minor,
       'identifier': identifier,
-      'pictureLink': pictureLink
+      'pictureLink': pictureLink,
+      'attendance': attendance
     };
   }
 }

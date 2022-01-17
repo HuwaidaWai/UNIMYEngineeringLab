@@ -248,7 +248,8 @@ class _AdminState extends State<Admin> {
         'name': nameTextController.text,
         'uuid': uuidTextController.text,
         'major': int.parse(majorTextController.text),
-        'minor': int.parse(minorTextController.text)
+        'minor': int.parse(minorTextController.text),
+        'attendance': false
       };
       var beaconEstimote = BeaconEstimote.fromJson(data);
 

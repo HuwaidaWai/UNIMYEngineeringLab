@@ -13,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_engineering_lab/constant/color_constant.dart';
 import 'package:smart_engineering_lab/landing_screen.dart';
+import 'package:smart_engineering_lab/model/user_model.dart';
 import 'package:smart_engineering_lab/services/database_services.dart';
 import 'package:smart_engineering_lab/services/local_notification_services.dart';
 import 'package:smart_engineering_lab/view/home/home_page_index.dart';
@@ -88,17 +89,30 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends StatefulWidget {
   const AuthWrapper({Key? key}) : super(key: key);
 
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
   @override
   Widget build(BuildContext context) {
     final firebaseUser = context.watch<User?>();
     final changeNotifier = context.watch<RootChangeNotifier>();
     print('This is firebase user : $firebaseUser');
     if (firebaseUser != null) {
-      DatabaseService(uid: firebaseUser.uid).readUserName;
-      return const HomePageIndex();
+      return StreamBuilder<UserModel>(
+          stream: DatabaseService(uid: firebaseUser.uid).readUserName,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              if (mounted) {
+                changeNotifier.setUser(snapshot.data!);
+              }
+            }
+            return const HomePageIndex();
+          });
     }
     return const LandingScreen();
   }

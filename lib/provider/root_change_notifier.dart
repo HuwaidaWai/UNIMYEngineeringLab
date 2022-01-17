@@ -9,7 +9,7 @@ class RootChangeNotifier with ChangeNotifier {
   Role? _role;
   File? _imageFood;
   UserModel? _userModel;
-
+  bool _isPushedAttendance = false;
   // ignore: prefer_final_fields
   Map<String, bool> _isPushedNotification = {};
   void setUser(UserModel userModel) {
@@ -21,6 +21,11 @@ class RootChangeNotifier with ChangeNotifier {
 
   void setRole(Role role) {
     _role = role;
+    notifyListeners();
+  }
+
+  void setAttendance(bool pushed) {
+    _isPushedAttendance = pushed;
     notifyListeners();
   }
 
@@ -39,6 +44,7 @@ class RootChangeNotifier with ChangeNotifier {
     notifyListeners();
   }
 
+  bool get getAttendance => _isPushedAttendance;
   File? get getBeacons => _imageFood;
   Map<String, bool> get getPushedNotification => _isPushedNotification;
   Role get getRoleState => _role!;

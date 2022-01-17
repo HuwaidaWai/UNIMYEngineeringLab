@@ -9,9 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:smart_engineering_lab/model/attendance_model.dart';
 import 'package:smart_engineering_lab/model/beacons_model.dart';
 import 'package:smart_engineering_lab/model/beacons_view_model.dart';
+import 'package:smart_engineering_lab/model/user_model.dart';
 import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
 import 'package:smart_engineering_lab/services/database_services.dart';
 import 'package:smart_engineering_lab/services/local_notification_services.dart';
@@ -46,8 +49,11 @@ class _HomePageIndexState extends State<HomePageIndex>
 
   @override
   void initState() {
+    final changeNotifier = context.read<RootChangeNotifier>();
     WidgetsBinding.instance?.addObserver(this);
-
+    // if (widget.userModel != null) {
+    //   changeNotifier.setUser(widget.userModel!);
+    // }
     listeningBluetoothState();
     controller.startStream.listen((flag) {
       printInfo(info: 'start stream $flag');
@@ -139,6 +145,7 @@ class _HomePageIndexState extends State<HomePageIndex>
                     (_major == result.beacons.first.major)) {
                   print('link: ${rangingBeaconsGlobal.pictureLink}');
                   var _beaconsViewModels = BeaconViewModel(
+                      attendance: rangingBeaconsGlobal.attendance,
                       beacon: result.beacons.firstWhere((element) =>
                           element.major == rangingBeaconsGlobal.major! &&
                           element.minor == rangingBeaconsGlobal.minor!),
@@ -179,12 +186,48 @@ class _HomePageIndexState extends State<HomePageIndex>
                               body: '${_beaconsViewModels.name} is nearest');
                       NotificationService().showNotification(
                           remoteNotificationLaporJumlah,
-                          jsonEncode({
+                          payloadNamaBeacon: jsonEncode({
                             'beacons': regionBeacons[result.region],
                             'region': result.region.toJson
                           }));
                       changeNotifier.setPushedNotification(
                           result.region.identifier, true);
+                    } else if (_beaconsViewModels.attendance! &&
+                        _beaconsViewModels.beacon!.accuracy <= 2.0 &&
+                        !changeNotifier.getAttendance &&
+                        regionBeacons[result.region] != null) {
+                      var remoteNotificationLaporJumlah =
+                          const firebaseMessaging.RemoteNotification(
+                              title: 'Attendace Marked',
+                              body: 'You have attend lab 1');
+                      changeNotifier.setAttendance(true);
+                      DatabaseService().createAttendance(AttendanceModel(
+                          date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                          time: DateFormat('jm').format(DateTime.now()),
+                          user: changeNotifier.getUserModel,
+                          id: '${DateFormat('yyyy-MM-dd').format(DateTime.now())}.${changeNotifier.getUserModel.name}',
+                          isAttend: true));
+                      NotificationService().showNotification(
+                        remoteNotificationLaporJumlah,
+                      );
+                    } else if (_beaconsViewModels.attendance! &&
+                        _beaconsViewModels.beacon!.accuracy >= 2.0 &&
+                        changeNotifier.getAttendance &&
+                        regionBeacons[result.region] != null) {
+                      var remoteNotificationLaporJumlah =
+                          const firebaseMessaging.RemoteNotification(
+                              title: 'Attendace Marked',
+                              body: 'You have left lab 1');
+                      changeNotifier.setAttendance(false);
+                      DatabaseService().updateAttendance(AttendanceModel(
+                          date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                          time: DateFormat('jm').format(DateTime.now()),
+                          user: changeNotifier.getUserModel,
+                          id: '${DateFormat('yyyy-MM-dd').format(DateTime.now())}.${changeNotifier.getUserModel.name}',
+                          isAttend: false));
+                      NotificationService().showNotification(
+                        remoteNotificationLaporJumlah,
+                      );
                     }
                   }
                 }

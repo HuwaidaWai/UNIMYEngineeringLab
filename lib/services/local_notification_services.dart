@@ -75,13 +75,12 @@ class NotificationService {
     //log('Message: $string1');
   }
 
-  Future showNotification(
-      RemoteNotification notification, String payloadNamaBeacon) async {
+  Future showNotification(RemoteNotification notification,
+      {String? payloadNamaBeacon}) async {
     AndroidNotificationDetails androidPlatformChannelSpecifics =
         const AndroidNotificationDetails(
       '1',
       'asda',
-
       importance: Importance.high,
       priority: Priority.high,
       playSound: true,
