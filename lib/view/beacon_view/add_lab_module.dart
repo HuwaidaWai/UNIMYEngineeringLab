@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -42,7 +43,7 @@ class _AddLabModuleState extends State<AddLabModule> {
             titleSection: TextEditingController(text: '5.0 Procedure'),
             description: []),
         SectionViewModel(
-            titleSection: TextEditingController(text: '6.0 Introduction'),
+            titleSection: TextEditingController(text: '6.0 Results'),
             description: []),
         SectionViewModel(
             titleSection: TextEditingController(text: '7.0 Discussion'),
@@ -174,7 +175,8 @@ class _AddLabModuleState extends State<AddLabModule> {
                                           .add(Description(
                                               type: 'TEXT',
                                               description:
-                                                  TextEditingController()));
+                                                  TextEditingController(
+                                                      text: '')));
                                     });
                                   },
                                   child: Row(
@@ -194,7 +196,11 @@ class _AddLabModuleState extends State<AddLabModule> {
                                     setState(() {
                                       labModuleView
                                           .sections![index].description!
-                                          .add(Description(type: 'PICTURE'));
+                                          .add(Description(
+                                              type: 'PICTURE',
+                                              description:
+                                                  TextEditingController(
+                                                      text: '')));
                                     });
                                   },
                                   child: Row(
@@ -292,6 +298,7 @@ class _AddLabModuleState extends State<AddLabModule> {
                           labModuleView.userPreparedFor = snapshot.data!.name;
                           labModuleView.userPreparedBy = <UserModel>[];
                           labModuleView.submitted = false;
+                          log('LAB MODULE VIEW :${labModuleView.toJson()}');
                           DatabaseService()
                               .createLabModule(labModuleView, changeNotifier)
                               .whenComplete(() => Navigator.of(context).pop());

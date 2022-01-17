@@ -16,6 +16,7 @@ import 'package:smart_engineering_lab/model/region_view_model.dart';
 import 'package:smart_engineering_lab/model/user_model.dart';
 import 'package:smart_engineering_lab/services/database_services.dart';
 import 'package:smart_engineering_lab/view/beacon_view/single_beacon_screen.dart';
+import 'package:smart_engineering_lab/view/home/attendance_screen.dart';
 import 'package:smart_engineering_lab/view/old/admin_page.dart';
 import 'package:smart_engineering_lab/view/old/lab_module_views.dart';
 import 'package:smart_engineering_lab/view/old/requirement_state_controller.dart';
@@ -288,263 +289,277 @@ class _BeaconScreenState extends State<BeaconScreen>
   @override
   Widget build(BuildContext context) {
     final firebaseUser = context.watch<User>();
-    return SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 36.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 8.0),
-                        child: Text(
-                          'Table Beacons',
-                          style: TextStyle(
-                              fontSize: 28, fontWeight: FontWeight.bold),
+    return Scaffold(
+      floatingActionButton: ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+              return AttendanceScreen();
+            }));
+          },
+          child: const Text('Attendance')),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 36.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 8.0),
+                          child: Text(
+                            'Table Beacons',
+                            style: TextStyle(
+                                fontSize: 28, fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      ),
-                      Text(
-                        'Choose your table section',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ],
+                        Text(
+                          'Choose your table section',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                StreamBuilder<UserModel>(
-                    stream: DatabaseService(uid: firebaseUser.uid).readUserName,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: snapshot.data!.role == 'STUDENT'
-                              ? const SizedBox()
-                              : ElevatedButton(
-                                  style: ElevatedButton.styleFrom(elevation: 0),
-                                  onPressed: () => Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                          builder: (context) => const Admin())),
-                                  child: Row(
-                                    children: const [
-                                      Text('Add',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                          )),
-                                      Icon(Icons.add)
-                                    ],
+                  StreamBuilder<UserModel>(
+                      stream:
+                          DatabaseService(uid: firebaseUser.uid).readUserName,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: snapshot.data!.role == 'STUDENT'
+                                ? const SizedBox()
+                                : ElevatedButton(
+                                    style:
+                                        ElevatedButton.styleFrom(elevation: 0),
+                                    onPressed: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Admin())),
+                                    child: Row(
+                                      children: const [
+                                        Text('Add',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                            )),
+                                        Icon(Icons.add)
+                                      ],
+                                    ),
+                                  ),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      })
+                ],
+              ),
+              widget.regionBeacons.isEmpty && widget.isLoading == true
+                  ? const Center(child: CircularProgressIndicator())
+                  : widget.regionBeacons.isEmpty && widget.isLoading == false
+                      ? const Center(child: Text('No Beacons'))
+                      : GridView.count(
+                          childAspectRatio: 1,
+                          shrinkWrap: true,
+                          physics: const ClampingScrollPhysics(),
+                          primary: false,
+                          padding: const EdgeInsets.all(20),
+                          crossAxisSpacing: 20,
+                          mainAxisSpacing: 10,
+                          crossAxisCount: 2,
+                          children: widget.regionBeacons.entries.map(
+                            (beacon) {
+                              return GestureDetector(
+                                onTap: () {
+                                  if (beacon.value.isNotEmpty) {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                SingleBeaconScreen(
+                                                    region: beacon.key,
+                                                    beaconViewModel:
+                                                        beacon.value.first)));
+                                  }
+                                },
+                                child: Card(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: beacon.value.isEmpty
+                                        ? const Text('Connecting to beacons')
+                                        : Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                decoration: const BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(8)),
+                                                    color: Colors.green),
+                                                height: 8,
+                                                width: 8,
+                                              ),
+                                              Expanded(
+                                                child: ListView.builder(
+                                                    shrinkWrap: true,
+                                                    itemCount:
+                                                        beacon.value.length,
+                                                    itemBuilder: (context, i) {
+                                                      return Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        child: Column(
+                                                          // crossAxisAlignment:
+                                                          //     CrossAxisAlignment
+                                                          //         .start,
+                                                          children: [
+                                                            Image.network(
+                                                              beacon.value[i]
+                                                                  .pictureLink!,
+                                                              height: 80,
+                                                              width: 80,
+                                                              errorBuilder: (context,
+                                                                      error,
+                                                                      stackTrace) =>
+                                                                  Image.asset(
+                                                                      'assets/unimyLogo.png'),
+                                                              fit: BoxFit.cover,
+                                                            ),
+                                                            Text(
+                                                              beacon.value[i]
+                                                                  .name!,
+                                                              style:
+                                                                  subtitleStyle2Small,
+                                                            ),
+                                                            // Text(
+                                                            //   'Signal: ${RssiSignal.rssiTranslator(beacon.value[i].beacon!.rssi)}',
+                                                            //   style:
+                                                            //       subtitleStyle2Small,
+                                                            // ),
+                                                            // Text(
+                                                            //   'Distance:  ${beacon.value[i].beacon!.accuracy.toString()} m',
+                                                            //   style:
+                                                            //       subtitleStyle2Small,
+                                                            // ),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    }),
+                                              ),
+                                            ],
+                                          ),
                                   ),
                                 ),
-                        );
-                      } else {
-                        return Container();
-                      }
-                    })
-              ],
-            ),
-            widget.regionBeacons.isEmpty && widget.isLoading == true
-                ? const Center(child: CircularProgressIndicator())
-                : widget.regionBeacons.isEmpty && widget.isLoading == false
-                    ? const Center(child: Text('No Beacons'))
-                    : GridView.count(
-                        childAspectRatio: 1,
-                        shrinkWrap: true,
-                        physics: const ClampingScrollPhysics(),
-                        primary: false,
-                        padding: const EdgeInsets.all(20),
-                        crossAxisSpacing: 20,
-                        mainAxisSpacing: 10,
-                        crossAxisCount: 2,
-                        children: widget.regionBeacons.entries.map(
-                          (beacon) {
-                            return GestureDetector(
-                              onTap: () {
-                                if (beacon.value.isNotEmpty) {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => SingleBeaconScreen(
-                                          region: beacon.key,
-                                          beaconViewModel:
-                                              beacon.value.first)));
-                                }
-                              },
-                              child: Card(
-                                child: Container(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: beacon.value.isEmpty
-                                      ? const Text('Connecting to beacons')
-                                      : Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              decoration: const BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(8)),
-                                                  color: Colors.green),
-                                              height: 8,
-                                              width: 8,
-                                            ),
-                                            Expanded(
-                                              child: ListView.builder(
-                                                  shrinkWrap: true,
-                                                  itemCount:
-                                                      beacon.value.length,
-                                                  itemBuilder: (context, i) {
-                                                    return Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: Column(
-                                                        // crossAxisAlignment:
-                                                        //     CrossAxisAlignment
-                                                        //         .start,
-                                                        children: [
-                                                          Image.network(
-                                                            beacon.value[i]
-                                                                .pictureLink!,
-                                                            height: 80,
-                                                            width: 80,
-                                                            errorBuilder: (context,
-                                                                    error,
-                                                                    stackTrace) =>
-                                                                Image.asset(
-                                                                    'assets/unimyLogo.png'),
-                                                            fit: BoxFit.cover,
-                                                          ),
-                                                          Text(
-                                                            beacon
-                                                                .value[i].name!,
-                                                            style:
-                                                                subtitleStyle2Small,
-                                                          ),
-                                                          // Text(
-                                                          //   'Signal: ${RssiSignal.rssiTranslator(beacon.value[i].beacon!.rssi)}',
-                                                          //   style:
-                                                          //       subtitleStyle2Small,
-                                                          // ),
-                                                          // Text(
-                                                          //   'Distance:  ${beacon.value[i].beacon!.accuracy.toString()} m',
-                                                          //   style:
-                                                          //       subtitleStyle2Small,
-                                                          // ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  }),
-                                            ),
-                                          ],
-                                        ),
-                                ),
-                              ),
-                            );
-                          },
-                        ).toList(),
-                      )
-            // : ListView(
-            //     physics: const ClampingScrollPhysics(),
-            //     shrinkWrap: true,
-            //     children: ListTile.divideTiles(
-            //       context: context,
-            //       tiles: widget.regionBeacons.values.map(
-            //         (beacon) {
-            //           if (beacon.isNotEmpty) {
-            //             return ListTile(
-            //               onTap: () {
-            //                 Navigator.push(context,
-            //                     MaterialPageRoute(builder: (conttext) {
-            //                   return const LabModuleViews();
-            //                 }));
-            //               },
-            //               contentPadding: const EdgeInsets.symmetric(
-            //                   horizontal: 20, vertical: 30),
-            //               shape: const RoundedRectangleBorder(
-            //                   borderRadius: BorderRadius.all(
-            //                       Radius.circular(16))),
-            //               tileColor: Colors.redAccent,
-            //               title: Column(
-            //                 crossAxisAlignment:
-            //                     CrossAxisAlignment.start,
-            //                 children: [
-            //                   Text(
-            //                     '${beacon.first.name}',
-            //                     style: const TextStyle(
-            //                         fontSize: 18.0,
-            //                         color: Colors.white),
-            //                   ),
-            //                   Text(
-            //                     '(${beacon.first.beacon!.proximityUUID})',
-            //                     style: const TextStyle(
-            //                         fontSize: 12.0,
-            //                         color: Colors.white),
-            //                   ),
-            //                 ],
-            //               ),
-            //               subtitle: Column(
-            //                 crossAxisAlignment:
-            //                     CrossAxisAlignment.start,
-            //                 children: [
-            //                   Row(
-            //                     mainAxisSize: MainAxisSize.max,
-            //                     children: <Widget>[
-            //                       // Flexible(
-            //                       //   child: Text(
-            //                       //     'Name: ${beacon.name}',
-            //                       //     style: const TextStyle(
-            //                       //         fontSize: 13.0, color: Colors.white),
-            //                       //   ),
-            //                       //   flex: 1,
-            //                       //   fit: FlexFit.tight,
-            //                       // ),
-            //                       Flexible(
-            //                         child: Text(
-            //                           'Major: ${beacon.first.beacon!.major}\nMinor: ${beacon.first.beacon!.minor}',
-            //                           style: const TextStyle(
-            //                               fontSize: 13.0,
-            //                               color: Colors.white),
-            //                         ),
-            //                         flex: 1,
-            //                         fit: FlexFit.tight,
-            //                       ),
-            //                       Flexible(
-            //                         child: Text(
-            //                           'Accuracy: ${beacon.first.beacon!.accuracy}m\nRSSI: ${beacon.first.beacon!.rssi}',
-            //                           style: const TextStyle(
-            //                               fontSize: 13.0,
-            //                               color: Colors.white),
-            //                         ),
-            //                         flex: 2,
-            //                         fit: FlexFit.tight,
-            //                       ),
-            //                     ],
-            //                   ),
-            //                   Padding(
-            //                     padding:
-            //                         const EdgeInsets.only(top: 8.0),
-            //                     child: Text(
-            //                       'Signal : ${RssiSignal.rssiTranslator(beacon.first.beacon!.rssi)}',
-            //                       style: const TextStyle(
-            //                           fontSize: 13.0,
-            //                           color: Colors.white),
-            //                     ),
-            //                   )
-            //                 ],
-            //               ),
-            //             );
-            //           } else {
-            //             return const Text('Getting Beacons data .. ');
-            //           }
-            //         },
-            //       ),
-            //     ).toList(),
-            //   ),
-          ],
+                              );
+                            },
+                          ).toList(),
+                        )
+              // : ListView(
+              //     physics: const ClampingScrollPhysics(),
+              //     shrinkWrap: true,
+              //     children: ListTile.divideTiles(
+              //       context: context,
+              //       tiles: widget.regionBeacons.values.map(
+              //         (beacon) {
+              //           if (beacon.isNotEmpty) {
+              //             return ListTile(
+              //               onTap: () {
+              //                 Navigator.push(context,
+              //                     MaterialPageRoute(builder: (conttext) {
+              //                   return const LabModuleViews();
+              //                 }));
+              //               },
+              //               contentPadding: const EdgeInsets.symmetric(
+              //                   horizontal: 20, vertical: 30),
+              //               shape: const RoundedRectangleBorder(
+              //                   borderRadius: BorderRadius.all(
+              //                       Radius.circular(16))),
+              //               tileColor: Colors.redAccent,
+              //               title: Column(
+              //                 crossAxisAlignment:
+              //                     CrossAxisAlignment.start,
+              //                 children: [
+              //                   Text(
+              //                     '${beacon.first.name}',
+              //                     style: const TextStyle(
+              //                         fontSize: 18.0,
+              //                         color: Colors.white),
+              //                   ),
+              //                   Text(
+              //                     '(${beacon.first.beacon!.proximityUUID})',
+              //                     style: const TextStyle(
+              //                         fontSize: 12.0,
+              //                         color: Colors.white),
+              //                   ),
+              //                 ],
+              //               ),
+              //               subtitle: Column(
+              //                 crossAxisAlignment:
+              //                     CrossAxisAlignment.start,
+              //                 children: [
+              //                   Row(
+              //                     mainAxisSize: MainAxisSize.max,
+              //                     children: <Widget>[
+              //                       // Flexible(
+              //                       //   child: Text(
+              //                       //     'Name: ${beacon.name}',
+              //                       //     style: const TextStyle(
+              //                       //         fontSize: 13.0, color: Colors.white),
+              //                       //   ),
+              //                       //   flex: 1,
+              //                       //   fit: FlexFit.tight,
+              //                       // ),
+              //                       Flexible(
+              //                         child: Text(
+              //                           'Major: ${beacon.first.beacon!.major}\nMinor: ${beacon.first.beacon!.minor}',
+              //                           style: const TextStyle(
+              //                               fontSize: 13.0,
+              //                               color: Colors.white),
+              //                         ),
+              //                         flex: 1,
+              //                         fit: FlexFit.tight,
+              //                       ),
+              //                       Flexible(
+              //                         child: Text(
+              //                           'Accuracy: ${beacon.first.beacon!.accuracy}m\nRSSI: ${beacon.first.beacon!.rssi}',
+              //                           style: const TextStyle(
+              //                               fontSize: 13.0,
+              //                               color: Colors.white),
+              //                         ),
+              //                         flex: 2,
+              //                         fit: FlexFit.tight,
+              //                       ),
+              //                     ],
+              //                   ),
+              //                   Padding(
+              //                     padding:
+              //                         const EdgeInsets.only(top: 8.0),
+              //                     child: Text(
+              //                       'Signal : ${RssiSignal.rssiTranslator(beacon.first.beacon!.rssi)}',
+              //                       style: const TextStyle(
+              //                           fontSize: 13.0,
+              //                           color: Colors.white),
+              //                     ),
+              //                   )
+              //                 ],
+              //               ),
+              //             );
+              //           } else {
+              //             return const Text('Getting Beacons data .. ');
+              //           }
+              //         },
+              //       ),
+              //     ).toList(),
+              //   ),
+            ],
+          ),
         ),
       ),
     );

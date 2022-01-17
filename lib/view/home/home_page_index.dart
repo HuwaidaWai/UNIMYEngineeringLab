@@ -399,7 +399,7 @@ class _HomePageIndexState extends State<HomePageIndex>
     return Scaffold(
       appBar: AppBar(
         title: const Text('UNIMY ENGINEERING LAB'),
-        centerTitle: true,
+        // centerTitle: true,
       ),
       body: PageView(
         onPageChanged: (index) {

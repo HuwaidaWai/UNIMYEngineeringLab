@@ -1,0 +1,3 @@
+class AttendanceModel {
+  String? name;
+}

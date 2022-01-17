@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/src/provider.dart';
 import 'package:smart_engineering_lab/constant/color_constant.dart';
 import 'package:smart_engineering_lab/model/lab_module_model.dart';
@@ -199,6 +200,24 @@ class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
                 ],
               ),
             ),
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                "Date",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+            ),
+            TextFormField(
+                enabled: true,
+                controller: TextEditingController(
+                    text: DateFormat('dd-MM-yyyy').format(DateTime.now())),
+                onChanged: (value) {
+                  widget.labModuleModel.date =
+                      DateFormat('dd-MM-yyyy').format(DateTime.now());
+                },
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(borderSide: BorderSide(width: 1)),
+                )),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: widget.labModuleModel.sections!

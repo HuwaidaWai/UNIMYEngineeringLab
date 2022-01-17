@@ -23,6 +23,7 @@ class LabModuleViewModel {
   String? labModuleId;
   String? userPreparedFor;
   List<UserModel>? userPreparedBy;
+  String? date;
   bool? submitted;
   LabModuleViewModel(
       {this.nameModule,
@@ -32,7 +33,8 @@ class LabModuleViewModel {
       this.labModuleId,
       this.userPreparedFor,
       this.userPreparedBy,
-      this.submitted});
+      this.submitted,
+      this.date});
   factory LabModuleViewModel.fromJson(Map data) {
     return LabModuleViewModel(
         nameModule: data['nameModule'],
@@ -48,7 +50,8 @@ class LabModuleViewModel {
       'beaconId': beaconId,
       'userPreparedFor': userPreparedFor,
       'userPreparedBy': userPreparedBy!.map((e) => e.toJson()).toList(),
-      'submitted': submitted
+      'submitted': submitted,
+      'date': date
     };
   }
 }
