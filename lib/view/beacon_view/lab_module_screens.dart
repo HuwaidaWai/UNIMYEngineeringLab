@@ -277,7 +277,13 @@ class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
                                     child: Column(
                                       children: e.description!.map((e1) {
                                         if (e1.type == 'PICTURE') {
-                                          return Image.network(e1.pictureLink!);
+                                          return Image.network(
+                                            e1.pictureLink!,
+                                            errorBuilder:
+                                                (context, error, stackTrace) =>
+                                                    const Text(
+                                                        'Link image problem'),
+                                          );
                                         } else {
                                           return Text(e1.description!.text);
                                         }
