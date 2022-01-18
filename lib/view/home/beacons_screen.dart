@@ -14,6 +14,7 @@ import 'package:smart_engineering_lab/model/beacons_model.dart';
 import 'package:smart_engineering_lab/model/beacons_view_model.dart';
 import 'package:smart_engineering_lab/model/region_view_model.dart';
 import 'package:smart_engineering_lab/model/user_model.dart';
+import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
 import 'package:smart_engineering_lab/services/database_services.dart';
 import 'package:smart_engineering_lab/view/beacon_view/single_beacon_screen.dart';
 import 'package:smart_engineering_lab/view/home/attendance_screen.dart';
@@ -289,14 +290,18 @@ class _BeaconScreenState extends State<BeaconScreen>
   @override
   Widget build(BuildContext context) {
     final firebaseUser = context.watch<User>();
+    final changeNotifier = context.read<RootChangeNotifier>();
     return Scaffold(
-      floatingActionButton: ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              return AttendanceScreen();
-            }));
-          },
-          child: const Text('Attendance')),
+      floatingActionButton: changeNotifier.getUserModel.role == 'STUDENT'
+          ? Container()
+          : ElevatedButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) {
+                  return const AttendanceScreen();
+                }));
+              },
+              child: const Text('Attendance')),
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 36.0),

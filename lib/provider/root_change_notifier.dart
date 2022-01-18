@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:smart_engineering_lab/enum/view_state_enum.dart';
+import 'package:smart_engineering_lab/model/attendance_model.dart';
 import 'package:smart_engineering_lab/model/user_model.dart';
 
 class RootChangeNotifier with ChangeNotifier {
@@ -10,8 +11,15 @@ class RootChangeNotifier with ChangeNotifier {
   File? _imageFood;
   UserModel? _userModel;
   bool _isPushedAttendance = false;
+  AttendanceModel? _attendanceModel;
   // ignore: prefer_final_fields
   Map<String, bool> _isPushedNotification = {};
+  void setAttendanceModel(AttendanceModel attendanceModel) {
+    _attendanceModel = attendanceModel;
+    notifyListeners();
+  }
+
+  AttendanceModel get getAttendanceModel => _attendanceModel!;
   void setUser(UserModel userModel) {
     _userModel = userModel;
     notifyListeners();

@@ -49,7 +49,6 @@ class _HomePageIndexState extends State<HomePageIndex>
 
   @override
   void initState() {
-    final changeNotifier = context.read<RootChangeNotifier>();
     WidgetsBinding.instance?.addObserver(this);
     // if (widget.userModel != null) {
     //   changeNotifier.setUser(widget.userModel!);
@@ -196,17 +195,25 @@ class _HomePageIndexState extends State<HomePageIndex>
                         _beaconsViewModels.beacon!.accuracy <= 2.0 &&
                         !changeNotifier.getAttendance &&
                         regionBeacons[result.region] != null) {
+                      /**
+                           * Show notification and createAttendance
+                           */
                       var remoteNotificationLaporJumlah =
                           const firebaseMessaging.RemoteNotification(
                               title: 'Attendace Marked',
                               body: 'You have attend lab 1');
                       changeNotifier.setAttendance(true);
-                      DatabaseService().createAttendance(AttendanceModel(
+                      var attendanceModel = AttendanceModel(
                           date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
                           time: DateFormat('jm').format(DateTime.now()),
                           user: changeNotifier.getUserModel,
                           id: '${DateFormat('yyyy-MM-dd').format(DateTime.now())}.${changeNotifier.getUserModel.name}',
-                          isAttend: true));
+                          isAttend: true);
+                      DatabaseService()
+                          .createAttendance(attendanceModel)
+                          .whenComplete(() => changeNotifier
+                              .setAttendanceModel(attendanceModel));
+
                       NotificationService().showNotification(
                         remoteNotificationLaporJumlah,
                       );
@@ -219,12 +226,14 @@ class _HomePageIndexState extends State<HomePageIndex>
                               title: 'Attendace Marked',
                               body: 'You have left lab 1');
                       changeNotifier.setAttendance(false);
-                      DatabaseService().updateAttendance(AttendanceModel(
-                          date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-                          time: DateFormat('jm').format(DateTime.now()),
-                          user: changeNotifier.getUserModel,
-                          id: '${DateFormat('yyyy-MM-dd').format(DateTime.now())}.${changeNotifier.getUserModel.name}',
-                          isAttend: false));
+                      // var attendanceModel = AttendanceModel(
+                      //     date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                      //     time: DateFormat('jm').format(DateTime.now()),
+                      //     user: changeNotifier.getUserModel,
+                      //     id: '${DateFormat('yyyy-MM-dd').format(DateTime.now())}.${changeNotifier.getUserModel.name}',
+                      //     isAttend: false);
+                      DatabaseService()
+                          .updateAttendance(changeNotifier.getAttendanceModel);
                       NotificationService().showNotification(
                         remoteNotificationLaporJumlah,
                       );

@@ -63,13 +63,38 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, i) {
                             return Card(
-                              child: Row(
-                                children: [
-                                  Text(snapshot.data![i].user!.name!),
-                                  Text(snapshot.data![i].user!.id!),
-                                  Text(snapshot.data![i].date!),
-                                  Text(snapshot.data![i].time!)
-                                ],
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                            child: Text(
+                                          snapshot.data![i].user!.name!,
+                                          textAlign: TextAlign.center,
+                                        )),
+                                        Expanded(
+                                            child: Text(
+                                          snapshot.data![i].user!.id!,
+                                          textAlign: TextAlign.center,
+                                        )),
+                                        Expanded(
+                                            child: Text(
+                                          snapshot.data![i].date!,
+                                          textAlign: TextAlign.center,
+                                        )),
+                                        Expanded(
+                                            child: Text(
+                                          snapshot.data![i].time!,
+                                        ))
+                                      ],
+                                    ),
+                                    Text(snapshot.data![i].isAttend!
+                                        ? "Attend"
+                                        : "Left")
+                                  ],
+                                ),
                               ),
                             );
                           });
