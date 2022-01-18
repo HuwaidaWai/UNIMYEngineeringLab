@@ -18,6 +18,7 @@ import 'package:smart_engineering_lab/provider/root_change_notifier.dart';
 import 'package:smart_engineering_lab/services/database_services.dart';
 import 'package:smart_engineering_lab/view/beacon_view/single_beacon_screen.dart';
 import 'package:smart_engineering_lab/view/home/attendance_screen.dart';
+import 'package:smart_engineering_lab/view/home/lab_report_submitted.dart';
 import 'package:smart_engineering_lab/view/old/admin_page.dart';
 import 'package:smart_engineering_lab/view/old/lab_module_views.dart';
 import 'package:smart_engineering_lab/view/old/requirement_state_controller.dart';
@@ -294,14 +295,27 @@ class _BeaconScreenState extends State<BeaconScreen>
     return Scaffold(
       floatingActionButton: changeNotifier.getUserModel.role == 'STUDENT'
           ? Container()
-          : ElevatedButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (context) {
-                  return const AttendanceScreen();
-                }));
-              },
-              child: const Text('Attendance')),
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return const AttendanceScreen();
+                      }));
+                    },
+                    child: const Text('Attendance')),
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return const LabReportSubmitted();
+                      }));
+                    },
+                    child: const Text('Lab Report')),
+              ],
+            ),
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 36.0),

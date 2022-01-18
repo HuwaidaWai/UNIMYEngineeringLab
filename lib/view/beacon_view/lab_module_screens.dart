@@ -1,5 +1,7 @@
 import 'dart:developer';
-
+import 'dart:io';
+import 'package:path/path.dart' as p;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -272,69 +274,228 @@ class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
                                                       e.titleSection!.text)))
                                           .toList(),
                                     ))
-                                : Container(
-                                    margin: const EdgeInsets.only(left: 8),
-                                    child: Column(
-                                      children: e.description!.map((e1) {
-                                        if (e1.type == 'PICTURE') {
-                                          return Image.network(
-                                            e1.pictureLink!,
-                                            errorBuilder:
-                                                (context, error, stackTrace) =>
+                                : e.titleSection!.text.contains('Results')
+                                    ? Container(
+                                        margin: const EdgeInsets.only(left: 8),
+                                        child: Column(
+                                          children: e.description!
+                                              .map(
+                                                (description) =>
+                                                    buildImageContainer(
+                                                  () async {
+                                                    var path;
+                                                    FilePickerResult? result =
+                                                        await FilePicker
+                                                            .platform
+                                                            .pickFiles(
+                                                      type: FileType.custom,
+                                                      allowedExtensions: [
+                                                        'jpg',
+                                                        'png'
+                                                      ],
+                                                    );
+                                                    if (result != null) {
+                                                      //File file = File(result.files.single.path);
+                                                      PlatformFile
+                                                          platformFile =
+                                                          result.files.first;
+
+                                                      path = platformFile.path;
+                                                      setState(() {
+                                                        description.path = path;
+                                                      });
+
+                                                      // var indexDescription =
+                                                      //     labModuleView
+                                                      //         .sections![
+                                                      //             index]
+                                                      //         .description!
+                                                      //         .indexOf(e);
+                                                      // setState(() {
+                                                      //   labModuleView
+                                                      //       .sections![
+                                                      //           index]
+                                                      //       .description![
+                                                      //           indexDescription]
+                                                      //       .path = path;
+                                                      // });
+
+                                                      print(
+                                                          'This is basename :${p.basename(path!)}');
+
+                                                      // changeNotifier.setBeaconsImage(File(path!));
+                                                    }
+                                                  },
+                                                  description.path,
+                                                  () {
+                                                    print('HELLOOO');
+                                                    setState(() {
+                                                      description.path = null;
+                                                    });
+                                                    // var indexDescription =
+                                                    //     widget
+                                                    //         .labModuleModel
+                                                    //         .sections![
+                                                    //             index]
+                                                    //         .description!
+                                                    //         .indexOf(
+                                                    //             description);
+                                                    // setState(() {
+                                                    //   labModuleView
+                                                    //       .sections![
+                                                    //           index]
+                                                    //       .description![
+                                                    //           indexDescription]
+                                                    //       .path = null;
+                                                    // });
+                                                  },
+                                                ),
+                                              )
+                                              .toList(),
+                                        ),
+                                      )
+                                    : Container(
+                                        margin: const EdgeInsets.only(left: 8),
+                                        child: Column(
+                                          children: e.description!.map((e1) {
+                                            if (e1.type == 'PICTURE') {
+                                              return Image.network(
+                                                e1.pictureLink!,
+                                                errorBuilder: (context, error,
+                                                        stackTrace) =>
                                                     const Text(
                                                         'Link image problem'),
-                                          );
-                                        } else {
-                                          return Text(e1.description!.text);
-                                        }
-                                      }).toList(),
-                                    ))
+                                              );
+                                            } else {
+                                              return Text(e1.description!.text);
+                                            }
+                                          }).toList(),
+                                        ))
                           ],
                         ),
                       ))
                   .toList(),
             ),
-            Container(
-              margin: const EdgeInsets.only(right: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                                  title: const Text('Are you sure to sumit?'),
-                                  actions: [
-                                    ElevatedButton(
-                                        onPressed: () async {
-                                          widget.labModuleModel.submitted =
-                                              true;
+            changeNotifier.getUserModel.role == 'STUDENT'
+                ? Container(
+                    margin: const EdgeInsets.only(right: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ElevatedButton(
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                        title: const Text(
+                                            'Are you sure to submit?'),
+                                        actions: [
+                                          Row(
+                                            children: [
+                                              ElevatedButton(
+                                                  onPressed: () async {
+                                                    // widget.labModuleModel
+                                                    //     .submitted = true;
 
-                                          log('LAB VIEW MODEL :${widget.labModuleModel.toJson()}');
-                                          await DatabaseService()
-                                              .updateLabModule(
-                                                  widget.labModuleModel,
-                                                  changeNotifier);
+                                                    // log('LAB VIEW MODEL :${widget.labModuleModel.toJson()}');
+                                                    // await DatabaseService()
+                                                    //     .sumittedLabModuleByStudent(
+                                                    //         widget
+                                                    //             .labModuleModel,
+                                                    //         changeNotifier);
 
-                                          Navigator.of(context).pop();
-                                          // Navigator.of(context).push(
-                                          //     MaterialPageRoute(
-                                          //         builder: (context) =>
-                                          //             HomePageIndex()));
-                                        },
-                                        child: const Text('Yes'))
-                                  ],
-                                )).whenComplete(
-                            () => Navigator.of(context).pop());
-                      },
-                      child: const Text('SUBMIT'))
-                ],
-              ),
-            )
+                                                    Navigator.of(context).pop();
+                                                    // Navigator.of(context).push(
+                                                    //     MaterialPageRoute(
+                                                    //         builder: (context) =>
+                                                    //             HomePageIndex()));
+                                                  },
+                                                  child: const Text('No')),
+                                              ElevatedButton(
+                                                  onPressed: () async {
+                                                    widget.labModuleModel
+                                                        .submitted = true;
+
+                                                    log('LAB VIEW MODEL :${widget.labModuleModel.toJson()}');
+                                                    await DatabaseService()
+                                                        .sumittedLabModuleByStudent(
+                                                            widget
+                                                                .labModuleModel,
+                                                            changeNotifier);
+
+                                                    Navigator.of(context).pop();
+                                                    Navigator.of(context).pop();
+                                                    // Navigator.of(context).push(
+                                                    //     MaterialPageRoute(
+                                                    //         builder: (context) =>
+                                                    //             HomePageIndex()));
+                                                  },
+                                                  child: const Text('Yes')),
+                                            ],
+                                          )
+                                        ],
+                                      ));
+                            },
+                            child: const Text('SUBMIT'))
+                      ],
+                    ),
+                  )
+                : Container()
           ],
         ),
       )),
     );
   }
+
+  Widget buildImageContainer(
+          Function() onPressed, String? path, Function() onPressedDelete,
+          {Function()? onPressDeleteContainer}) =>
+      Column(
+        children: [
+          onPressDeleteContainer == null
+              ? Container()
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                        onPressed: onPressDeleteContainer,
+                        child: const Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ))
+                  ],
+                ),
+          Container(
+            decoration: BoxDecoration(
+                border: Border.all(width: 1.0, color: Colors.grey)),
+            padding: const EdgeInsets.all(8),
+            child: Stack(
+              children: [
+                Center(
+                  child: path == null
+                      ? OutlinedButton(
+                          child: Text(
+                            'Pick File',
+                            style: subtitleStyle2Small,
+                          ),
+                          onPressed: onPressed)
+                      : Image.file(
+                          File(path),
+                          height: 100,
+                        ),
+                ),
+                path == null
+                    ? Container()
+                    : Positioned(
+                        top: 5,
+                        right: 10,
+                        child: IconButton(
+                          onPressed: onPressedDelete,
+                          icon: const Icon(Icons.delete),
+                        )),
+              ],
+            ),
+          ),
+        ],
+      );
 }

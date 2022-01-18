@@ -33,6 +33,9 @@ class DatabaseService {
   final CollectionReference attendanceCollection =
       FirebaseFirestore.instance.collection('attendaces');
 
+  final CollectionReference submittedLabModuleCollection =
+      FirebaseFirestore.instance.collection('submittedLabModules');
+
 //USER DATA
   Future createUserData({
     required String name,
@@ -116,6 +119,31 @@ class DatabaseService {
     }).whenComplete(() => rootChangeNotifier.setState(ViewState.IDLE));
   }
 
+  Future sumittedLabModuleByStudent(LabModuleViewModel labModuleViewModel,
+      RootChangeNotifier changeNotifier) async {
+    try {
+      changeNotifier.setState(ViewState.BUSY);
+      for (var section in labModuleViewModel.sections!) {
+        if (section.titleSection!.text.contains('results')) {
+          await Future.forEach<Description>(section.description!,
+              (description) async {
+            if (description.path != null) {
+              final task = await StorageService.uploadFile(
+                  destination:
+                      'labModuleImage/${labModuleViewModel.beaconId}/${labModuleViewModel.labModuleId}/${basename(description.path!)}',
+                  file: File(description.path!));
+              description.pictureLink = await task.ref.getDownloadURL();
+            }
+          });
+        }
+      }
+      await submittedLabModuleCollection.doc().set(labModuleViewModel.toJson());
+      changeNotifier.setState(ViewState.IDLE);
+    } catch (e) {
+      changeNotifier.setState(ViewState.IDLE);
+    }
+  }
+
   Future createLabModule(LabModuleViewModel labModuleViewModel,
       RootChangeNotifier changeNotifier) async {
     try {
@@ -171,6 +199,14 @@ class DatabaseService {
 
   Future deleteLabModule(String labModuleId) async {
     await labModuleCollection.doc(labModuleId).delete();
+  }
+
+  Stream<List<LabModuleViewModel>> listLabModulesSubmitted(String name) {
+    return submittedLabModuleCollection
+        // .where('beaconId', isEqualTo: beaconId)
+        .where('userPreparedFor')
+        .snapshots()
+        .map((event) => _listModuleViewModel(event));
   }
 
   Stream<List<LabModuleViewModel>> listLabModules(String beaconId) {
