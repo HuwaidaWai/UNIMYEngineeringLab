@@ -126,7 +126,7 @@ class DatabaseService {
           if (description.path != null) {
             final task = await StorageService.uploadFile(
                 destination:
-                    'labModuleImage/${labModuleViewModel.beaconId}/${basename(description.path!)}',
+                    'labModuleImage/${labModuleViewModel.beaconId}/${labModuleViewModel.labModuleId}/${basename(description.path!)}',
                 file: File(description.path!));
             description.pictureLink = await task.ref.getDownloadURL();
           }
@@ -241,7 +241,8 @@ class DatabaseService {
             date: e['date'],
             time: e['time'],
             user: UserModel.fromJson(e['user']),
-            id: e['id']))
+            id: e['id'],
+            isAttend: e['isAttend']))
         .toList());
   }
 

@@ -64,7 +64,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           itemBuilder: (context, i) {
                             return Card(
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
                                 child: Column(
                                   children: [
                                     Row(
@@ -87,12 +88,21 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                         Expanded(
                                             child: Text(
                                           snapshot.data![i].time!,
+                                          textAlign: TextAlign.center,
                                         ))
                                       ],
                                     ),
-                                    Text(snapshot.data![i].isAttend!
-                                        ? "Attend"
-                                        : "Left")
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: [
+                                          const Text('STATUS : '),
+                                          Text(snapshot.data![i].isAttend!
+                                              ? "Attend"
+                                              : "Left"),
+                                        ],
+                                      ),
+                                    )
                                   ],
                                 ),
                               ),

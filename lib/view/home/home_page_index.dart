@@ -192,7 +192,7 @@ class _HomePageIndexState extends State<HomePageIndex>
                       changeNotifier.setPushedNotification(
                           result.region.identifier, true);
                     } else if (_beaconsViewModels.attendance! &&
-                        _beaconsViewModels.beacon!.accuracy <= 2.0 &&
+                        _beaconsViewModels.beacon!.accuracy <= 30.0 &&
                         !changeNotifier.getAttendance &&
                         regionBeacons[result.region] != null) {
                       /**
@@ -218,7 +218,7 @@ class _HomePageIndexState extends State<HomePageIndex>
                         remoteNotificationLaporJumlah,
                       );
                     } else if (_beaconsViewModels.attendance! &&
-                        _beaconsViewModels.beacon!.accuracy >= 2.0 &&
+                        _beaconsViewModels.beacon!.accuracy >= 30.0 &&
                         changeNotifier.getAttendance &&
                         regionBeacons[result.region] != null) {
                       var remoteNotificationLaporJumlah =
