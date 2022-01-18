@@ -78,7 +78,7 @@ class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
                   const Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
-                      "Prepared by",
+                      "Prepared for",
                       style:
                           TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                     ),
@@ -100,7 +100,7 @@ class _LabModuleScreenNewState extends State<LabModuleScreenNew> {
                   const Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
-                      "Prepared for",
+                      "Prepared by",
                       style:
                           TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                     ),
